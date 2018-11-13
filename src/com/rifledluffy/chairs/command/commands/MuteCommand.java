@@ -28,7 +28,7 @@ public class MuteCommand extends SubCommand {
     
     @Override
 	public void onCommand(ConsoleCommandSender sender, String[] args) {
-      sender.sendMessage("§cOnly players can use commands for this plugin.");
+      sender.sendMessage("ï¿½cOnly players can use commands for this plugin.");
 	}
 
 	@Override
@@ -49,7 +49,6 @@ public class MuteCommand extends SubCommand {
 			player.sendMessage(message);
 			muted.add(player.getUniqueId());
 		}
-		Util.callEvent(new MessageEvent(MessageType.COMMAND, player));
 	}
 
 	@Override
