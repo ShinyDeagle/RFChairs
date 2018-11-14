@@ -35,7 +35,7 @@ public class ReloadCommand extends SubCommand {
 
 	@Override
 	public void onCommand(Player player, String[] args) {
-		if (!player.hasPermission("rfchairs.reload")) return;
+		if (!player.hasPermission("rfchairs.reload") && !player.hasPermission("rfchairs.manage")) return;
 		ConfigManager newConfig = plugin.getConfigManager();
 		newConfig.reloadConfig();
 		newConfig.reloadMessages();

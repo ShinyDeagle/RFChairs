@@ -1,6 +1,6 @@
 main: com.rifledluffy.chairs.RFChairs
 name: RFChairs
-version: 4.0
+version: 4.1
 author: Rifle D. Luffy
 api-version: 1.13
 description: Chairs but Rifle's way.
@@ -22,6 +22,9 @@ permissions:
     default: true
   rfchairs.priority:
     description: allows the priority removal of other players from chairs
+    default: op
+  rfchairs.manage:
+    description: allows players to manage the plugin
     default: op
   rfchairs.update:
     description: notifiers player of update

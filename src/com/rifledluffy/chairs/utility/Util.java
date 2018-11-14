@@ -225,7 +225,7 @@ public class Util {
 			if (!trapDoor.isOpen()) return false;
 			return trapDoor.getFacing().getOppositeFace() == ((Stairs) block.getBlockData()).getFacing();
 		}
-		return true;
+		return false;
 	}
 	
 	public static boolean blockIsChair(Block block, List<Chair> chairs) {

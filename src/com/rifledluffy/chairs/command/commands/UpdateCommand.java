@@ -24,27 +24,28 @@ public class UpdateCommand extends SubCommand {
 	public void onCommand(ConsoleCommandSender sender, String[] args) {
     	Object[] updates = Updater.getLastUpdate();
 		if (updates.length == 2) {
-			sender.sendMessage("§6[§eRifle's Chairs§6] New update avaible:");
-		    sender.sendMessage("§6New version: §e" + updates[0]);
-		    sender.sendMessage("§6Your version: §e" + plugin.getDescription().getVersion());
-		    sender.sendMessage("§6What's new: §e" + updates[1]);
+			sender.sendMessage("ï¿½6[ï¿½eRifle's Chairsï¿½6] New update available:");
+		    sender.sendMessage("ï¿½6New version: ï¿½e" + updates[0]);
+		    sender.sendMessage("ï¿½6Your version: ï¿½e" + plugin.getDescription().getVersion());
+		    sender.sendMessage("ï¿½6What's new: ï¿½e" + updates[1]);
 		} else {
-		    sender.sendMessage("§8[§6Rifle's Chairs§8]: §6Your version: §e" + plugin.getDescription().getVersion());
-	        sender.sendMessage("§8[§6Rifle's Chairs§8]: §aYou are up to date!");
+		    sender.sendMessage("ï¿½8[ï¿½6Rifle's Chairsï¿½8]: ï¿½6Your version: ï¿½e" + plugin.getDescription().getVersion());
+	        sender.sendMessage("ï¿½8[ï¿½6Rifle's Chairsï¿½8]: ï¿½aYou are up to date!");
 	    }
 	}
 	
 	@Override
     public void onCommand(Player player, String[] args) {
+		if (!player.hasPermission("rfchairs.update") && !player.hasPermission("rfchairs.manage")) return;
 		Object[] updates = Updater.getLastUpdate();
 		if (updates.length == 2) {
-			player.sendMessage("§6[§eRifle's Chairs§6] New update avaible:");
-		    player.sendMessage("§6New version: §e" + updates[0]);
-		    player.sendMessage("§6Your version: §e" + plugin.getDescription().getVersion());
-		    player.sendMessage("§6What's new: §e" + updates[1]);
+			player.sendMessage("ï¿½6[ï¿½eRifle's Chairsï¿½6] New update available:");
+		    player.sendMessage("ï¿½6New version: ï¿½e" + updates[0]);
+		    player.sendMessage("ï¿½6Your version: ï¿½e" + plugin.getDescription().getVersion());
+		    player.sendMessage("ï¿½6What's new: ï¿½e" + updates[1]);
 		} else {
-		    player.sendMessage("§8[§6Rifle's Chairs§8]: §6Your version: §e" + plugin.getDescription().getVersion());
-	        player.sendMessage("§8[§6Rifle's Chairs§8]: §aYou are up to date!");
+		    player.sendMessage("ï¿½8[ï¿½6Rifle's Chairsï¿½8]: ï¿½6Your version: ï¿½e" + plugin.getDescription().getVersion());
+	        player.sendMessage("ï¿½8[ï¿½6Rifle's Chairsï¿½8]: ï¿½aYou are up to date!");
 	    }
     }
 

@@ -182,6 +182,9 @@ public class ChairManager implements Listener {
 			exit.add(0.5,0,0.5);
 			player.teleport(exit);
 		}
+		if (!flag) {
+			player.setVelocity(player.getEyeLocation().getDirection().setY(0).normalize().multiply(0.25));
+		}
 	}
 	
 	@EventHandler
@@ -288,7 +291,7 @@ public class ChairManager implements Listener {
 	
 	@EventHandler
 	public void onRightClick(PlayerInteractEvent event) {
-		if (disabledWorlds.contains(event.getPlayer().getWorld())) return;
+		if (disabledWorlds.size() > 0 && disabledWorlds.contains(event.getPlayer().getWorld())) return;
 		if (event.isCancelled()) return;
 		if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
 		if (event.getPlayer().isSneaking()) return;
@@ -324,7 +327,10 @@ public class ChairManager implements Listener {
 							return;
 						}
 					}
-				} else if (!(trapSeats && !Util.throneChair(block))) return;
+				}
+				if (trapSeats && block.getRelative(BlockFace.UP).getType() != Material.AIR) {
+					if (!Util.throneChair(block)) return;
+				}
 			}
 		} else if (block.getRelative(BlockFace.UP).getType() != Material.AIR) return;
 		
