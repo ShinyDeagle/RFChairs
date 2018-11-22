@@ -2,6 +2,7 @@ package com.rifledluffy.chairs;
 
 import java.io.IOException;
 
+import com.sk89q.worldedit.math.BlockVector3;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -33,11 +34,13 @@ public class RFChairs extends JavaPlugin {
 		try {
 			Class.forName("com.sk89q.worldguard.WorldGuard");
 			Class.forName("com.sk89q.worldedit.WorldEdit");
+			Class.forName("com.sk89q.worldedit.math.BlockVector3");
 			worldGuardManager = new WorldGuardManager();
 			worldGuardManager.setup();
 			getLogger().info("Found WorldGuard && WorldEdit! Applying Custom Flag...");
 		} catch (ClassNotFoundException e) {
 			getLogger().info("Missing either WorldGuard or WorldEdit, Disabling Custom Flag Features...");
+			getLogger().info("Latest WorldGuard/WorldEdit features could be missing. Please Update!");
 		}
 		
 		if (worldGuardManager != null) worldGuardManager.register();
