@@ -40,7 +40,7 @@ scale-toss-velocity: true
 velocity-scale-factor: 2
 regen-when-sitting: true
 regen-potency: 0
-allow-custom-messages: true
+allow-custom-messages: false
 priority-on-if-has-perm: true
 allowed-chairs:
   - ACACIA_STAIRS

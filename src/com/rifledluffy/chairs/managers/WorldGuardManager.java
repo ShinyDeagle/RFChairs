@@ -1,11 +1,9 @@
 package com.rifledluffy.chairs.managers;
 
-import com.sk89q.worldedit.math.BlockVector3;
-import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
-
 import com.rifledluffy.chairs.RFChairs;
 import com.rifledluffy.chairs.chairs.Chair;
+import com.rifledluffy.chairs.utility.Util;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
@@ -14,11 +12,17 @@ import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.flags.registry.FlagConflictException;
 import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
-import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
+
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class WorldGuardManager {
-	
+
 	private RFChairs plugin = RFChairs.getInstance();
 	public WorldGuard worldGuard;
 	public WorldGuardPlugin worldGuardPlugin;
@@ -46,7 +50,7 @@ public class WorldGuardManager {
 	public WorldGuardPlugin getWorldGuard() {
 		Plugin plugin = this.plugin.getServer().getPluginManager().getPlugin("WorldGuard");
 		
-		if (plugin == null || !(plugin instanceof WorldGuardPlugin)) return null;
+		if (!(plugin instanceof WorldGuardPlugin)) return null;
 		return (WorldGuardPlugin) plugin;
 	}
 	
@@ -58,16 +62,18 @@ public class WorldGuardManager {
 		WorldGuardManager worldManager = plugin.getWorldGuardManager();
 
 		LocalPlayer localPlayer = worldManager.getWorldGuard().wrapPlayer(player);
-		RegionManager regionManager = worldManager.getContainer().get(WorldGuard.getInstance().getPlatform().getWorldByName(chair.getLocation().getWorld().getName()));
-		ApplicableRegionSet regionSet = regionManager.getApplicableRegions(BlockVector3.at(xPos, yPos, zPos));
 
-		if (!regionSet.testState(localPlayer, (StateFlag) worldManager.getFlag())) return false;
-		return true;
+        BlockVector3 vector3 = BlockVector3.at(xPos, yPos, zPos);
+
+        List<ApplicableRegionSet> regionSetList = getContainer().getLoaded().stream()
+                .map(manager -> manager.getApplicableRegions(vector3))
+                .collect(Collectors.toList());
+
+        if (regionSetList.size() == 0) return true;
+
+        return regionSetList.stream()
+                .allMatch(set -> set.testState(localPlayer, (StateFlag) worldManager.getFlag()));
 	}
-	
-	public boolean hasWorldGuard() {
-    	return worldGuard != null;
-    }
 
 	public RegionContainer getContainer() {
 		return worldGuard.getPlatform().getRegionContainer();

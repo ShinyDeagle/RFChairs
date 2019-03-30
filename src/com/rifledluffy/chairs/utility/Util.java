@@ -12,6 +12,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Bisected;
+import org.bukkit.block.data.Directional;
 import org.bukkit.block.data.Levelled;
 import org.bukkit.block.data.type.Slab;
 import org.bukkit.block.data.type.Stairs;
@@ -44,21 +45,13 @@ public class Util {
 	public static void debug(String message) {
 		for (Player player : plugin.getServer().getOnlinePlayers()) player.sendMessage(message);
 	}
-	
-	public static void debug(int message) {
-		for (Player player : plugin.getServer().getOnlinePlayers()) player.sendMessage(Integer.toString(message));
-	}
-	
-	public static void debug(Double message) {
-		for (Player player : plugin.getServer().getOnlinePlayers()) player.sendMessage(Double.toString(message));
-	}
-	
-	public static void debug(Boolean message) {
-		for (Player player : plugin.getServer().getOnlinePlayers()) player.sendMessage(Boolean.toString(message));
-	}
 
 	public static void debug(Object message) {
 		debug(message.toString());
+	}
+
+	public static void debug(List<Object> messages) {
+		messages.forEach(Util::debug);
 	}
 	
 	public static boolean isStairBlock(Material material) {
@@ -68,7 +61,7 @@ public class Util {
 	
 	public static String replaceMessage(Player player, String string) {
 		string = ChatColor.translateAlternateColorCodes('&',string);
-		string = string.replace("%user%", player.getName());
+		string = string.replace("%user%", player.getDisplayName());
 		return string;
 	}
 	
@@ -92,19 +85,17 @@ public class Util {
 	
 	public static String replaceMessage(Player player, Player target, String string) {
 		string = ChatColor.translateAlternateColorCodes('&',string);
-		string = string.replace("%user%", player.getName());
+		string = string.replace("%user%", player.getDisplayName());
 		string = string.replace("%seated%", target.getName());
 		return string;
 	}
 	
 	public static boolean isSlabBlock(Material material) {
-		if (SlabBlock.from(material) == "null") return false;
-		return true;
+		return !SlabBlock.from(material).equals("null");
 	}
 	
 	public static boolean isCarpetBlock(Material material) {
-		if (CarpetBlock.from(material) == "null") return false;
-		return true;
+		return !CarpetBlock.from(material).equals("null");
 	}
 	
 	public static boolean validateStair(Block block) {
@@ -187,6 +178,8 @@ public class Util {
 		
 		BlockFace side = faces.get(0);
 		BlockFace otherSide = faces.get(1);
+
+		if (block.getRelative(BlockFace.UP).getType() != Material.AIR) return false;
 		
 		if (validatedChair(block.getRelative(side))) if (validSeat(block.getRelative(side), side, block)) validSides++;
 		if (validatedChair(block.getRelative(otherSide))) if (validSeat(block.getRelative(otherSide), otherSide, block)) validSides++;
@@ -200,8 +193,8 @@ public class Util {
 		Stairs stair = (Stairs) block.getState().getBlockData();
 		Stairs first = (Stairs) original.getState().getBlockData();
 		if (stair.getFacing() != first.getFacing()) return false;
-		if (block.getRelative(side).getType() == Material.WALL_SIGN) {
-			WallSign sign =((WallSign)block.getRelative(side).getBlockData());
+		if (block.getRelative(side).getBlockData() instanceof WallSign || block.getRelative(side).getBlockData() instanceof TrapDoor) {
+			Directional sign =((Directional)block.getRelative(side).getBlockData());
 			return sign.getFacing() == side;
 		}
 		else if (validatedChair(block.getRelative(side))) return validSeat(block.getRelative(side), side, original);

@@ -318,15 +318,12 @@ public class ChairManager implements Listener {
 			else {
 				if (checkForSigns) {
 					if (!Util.validCouch(block)) {
-						if (!trapSeats) {
-							Util.callEvent(new MessageEvent(MessageType.NOSIGNS, player));
-							return;
-						}
+						if (!trapSeats) return;
 						if (!Util.throneChair(block)) {
 							Util.callEvent(new MessageEvent(MessageType.NOSIGNS, player));
 							return;
 						}
-					}
+					} else if (block.getRelative(BlockFace.UP).getType() != Material.AIR) return;
 				}
 				if (trapSeats && block.getRelative(BlockFace.UP).getType() != Material.AIR) {
 					if (!Util.throneChair(block)) return;
