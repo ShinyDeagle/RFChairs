@@ -253,15 +253,16 @@ public class Util {
 		Double height = 0.25D;
 		if (Util.isCarpetBlock(chair.getBlock().getType())) height = 0D;
 
-                ArmorStand armorStand = (ArmorStand) seat.getWorld().spawn(seat.add(0.5, height, 0.5).setDirection(vector), ArmorStand.class, stand -> {
-                        stand.setVisible(false);
-                        stand.setGravity(false);
-                        stand.setInvulnerable(true);
-                        stand.setMarker(true);
-                        stand.setCollidable(false);
-                    });
-		
-		return armorStand;
+		return seat.getWorld().spawn(
+				seat.add(0.5, height, 0.5).setDirection(vector),
+				ArmorStand.class,
+				stand -> {
+					stand.setVisible(false);
+					stand.setGravity(false);
+					stand.setInvulnerable(true);
+					stand.setMarker(true);
+					stand.setCollidable(false);
+				});
 	}
 	
 	public static float getAbsoluteAngle(Location loc) {
