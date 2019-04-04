@@ -2,6 +2,7 @@ package com.rifledluffy.chairs;
 
 import java.io.IOException;
 
+import com.rifledluffy.chairs.managers.PlotSquaredManager;
 import com.sk89q.worldedit.math.BlockVector3;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -22,6 +23,7 @@ public class RFChairs extends JavaPlugin {
 	public ChairManager chairManager;
 	public MessageManager messageManager;
 	public WorldGuardManager worldGuardManager;
+	public PlotSquaredManager plotSquaredManager;
 	
 	public String updateMessage;
 	
@@ -31,6 +33,22 @@ public class RFChairs extends JavaPlugin {
 	@Override
 	public void onLoad() {
 		setInstance(this);
+		loadWorldGuard();
+	}
+
+	private void loadPlotSquared() {
+		try {
+			Class.forName("com.github.intellectualsites.plotsquared.api.PlotAPI");
+			plotSquaredManager = new PlotSquaredManager();
+			plotSquaredManager.setup();
+			getLogger().info("Found PlotSquared! Applying Custom Flag...");
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+			getLogger().info("PlotSquared was not found! Disabling Custom Flag Features...");
+		}
+	}
+
+	private void loadWorldGuard() {
 		try {
 			Class.forName("com.sk89q.worldguard.WorldGuard");
 			Class.forName("com.sk89q.worldedit.WorldEdit");
@@ -39,10 +57,10 @@ public class RFChairs extends JavaPlugin {
 			worldGuardManager.setup();
 			getLogger().info("Found WorldGuard && WorldEdit! Applying Custom Flag...");
 		} catch (ClassNotFoundException e) {
-			getLogger().info("Missing either WorldGuard or WorldEdit, Disabling Custom Flag Features...");
+			getLogger().info("Missing either WorldGuard or WorldEdit! Disabling Custom Flag Features...");
 			getLogger().info("Latest WorldGuard/WorldEdit features could be missing. Please Update!");
 		}
-		
+
 		if (worldGuardManager != null) worldGuardManager.register();
 	}
 	
@@ -118,7 +136,11 @@ public class RFChairs extends JavaPlugin {
 		return this.worldGuardManager;
 	}
 
-    private static void setInstance(RFChairs instance) {
+	public PlotSquaredManager getPlotSquaredManager() {
+		return plotSquaredManager;
+	}
+
+	private static void setInstance(RFChairs instance) {
     	RFChairs.instance = instance;
     }
 
@@ -126,8 +148,12 @@ public class RFChairs extends JavaPlugin {
       getLogger().info(string);
     }
 
-	public boolean hasWorldGuard() {
+	boolean hasWorldGuard() {
 		return worldGuardManager != null;
+	}
+
+	boolean hasPlotSquared() {
+		return plotSquaredManager != null;
 	}
 
 }

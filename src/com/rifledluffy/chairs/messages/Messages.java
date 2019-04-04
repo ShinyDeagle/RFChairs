@@ -13,6 +13,7 @@ public class Messages {
 	private final static String priority = "priority-replaced";
 	private final static String noSigns = "no-sign-at-ends";
 	private final static String worldGuard = "denied-by-worldguard";
+	private final static String plotSquared = "denied-by-plotsquared";
 	
 	private final static String defaultOccupied = "&8[&6Rifle's Chairs&8] &cCan't sit there &7%user%&a, my homie &7%seated%&c sits there.";
 	private final static String defaultTooFar = "&8[&6Rifle's Chairs&8] &cCan't sit there &7%user%&c. You are too far!";
@@ -25,6 +26,7 @@ public class Messages {
 	private final static String defaultPriority = "&8[&6Rifle's Chairs&8] &cYou forcibly tossed to make space for &7%user%&c, &7%seated%";
 	private final static String defaultNoSigns = "&8[&6Rifle's Chairs&8] &cThis seat &8[&7which is a stair&8]&c doesn't have signs on both its ends!";
 	private final static String defaultWorldGuard = "&8[&6Rifle's Chairs&8] &cYou may not sit in this region!";
+	private final static String defaultPlotSquared = "&8[&6Rifle's Chairs&8] &cYou may not sit in this plot!";
 
 	public static String getDefault(MessageType type) {
 		switch (type) {
@@ -52,6 +54,8 @@ public class Messages {
 				return Messages.defaultNoSigns;
 			case WORLDGUARD:
 				return Messages.defaultWorldGuard;
+			case PLOTSQUARED:
+				return Messages.defaultPlotSquared;
 		}
 	}
 	
@@ -81,6 +85,8 @@ public class Messages {
 				return Messages.noSigns;
 			case WORLDGUARD:
 				return Messages.worldGuard;
+			case PLOTSQUARED:
+				return Messages.plotSquared;
 		}
 	}
 }

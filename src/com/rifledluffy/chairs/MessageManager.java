@@ -26,7 +26,7 @@ public class MessageManager implements Listener {
 	private int tempMuteDuration;
 	
 	public List<UUID> muted = new ArrayList<UUID>();
-	public List<UUID> tempMute = new ArrayList<UUID>();
+	private List<UUID> tempMute = new ArrayList<UUID>();
 	
 	public void reload(RFChairs plugin) {
 		configManager = plugin.getConfigManager();
@@ -35,7 +35,7 @@ public class MessageManager implements Listener {
 		tempMuteDuration = messages.getInt("temp-mute-duration", 0);
 	}
 	
-	public void tempMute(Player player) {
+	private void tempMute(Player player) {
 		int duration = tempMuteDuration;
 		tempMute.add(player.getUniqueId());
 		BukkitRunnable runnable = new BukkitRunnable() {
@@ -47,7 +47,7 @@ public class MessageManager implements Listener {
 		runnable.runTaskLater(plugin, duration);
 	}
 	
-	public boolean tempMuted(Player player) {
+	private boolean tempMuted(Player player) {
 		return tempMute.contains(player.getUniqueId());
 	}
 	
@@ -63,7 +63,7 @@ public class MessageManager implements Listener {
 		}
 	}
 	
-	public String processString(MessageEvent event) {
+	private String processString(MessageEvent event) {
 		MessageType type = event.getType();
 		MessageConstruct construct = event.getConstruct();
 		String string;

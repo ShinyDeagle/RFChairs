@@ -239,7 +239,7 @@ public class Util {
 		return null;
 	}
 	
-	public static ArmorStand generateFakeSeat(Chair chair) {
+	public static ArmorStand generateFakeSeat(Chair chair, Vector seatingPosition) {
 		if (chair == null) return null;
 		Location seat = chair.getLocation();
 		BlockFace facing = null;
@@ -249,12 +249,11 @@ public class Util {
 		Vector vector;
 		if (facing != null) vector = getVectorFromFace(chair.getBlock(), facing.getOppositeFace());
 		else vector = getVectorFromNearBlock(chair.getBlock(),playerLoc.getBlock());
-		
-		Double height = 0.25D;
-		if (Util.isCarpetBlock(chair.getBlock().getType())) height = 0D;
+
+		if (Util.isCarpetBlock(chair.getBlock().getType())) seatingPosition.setY(seatingPosition.getY() - 0.25);
 
 		return seat.getWorld().spawn(
-				seat.add(0.5, height, 0.5).setDirection(vector),
+				seat.add(seatingPosition).setDirection(vector),
 				ArmorStand.class,
 				stand -> {
 					stand.setVisible(false);

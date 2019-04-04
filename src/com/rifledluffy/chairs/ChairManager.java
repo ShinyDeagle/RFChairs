@@ -15,8 +15,6 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.data.type.Stairs;
-import org.bukkit.block.data.type.TrapDoor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
@@ -43,7 +41,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.projectiles.ProjectileSource;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.spigotmc.event.entity.EntityDismountEvent;
 
@@ -106,6 +103,8 @@ public class ChairManager implements Listener {
 	//Mostly buggy, probably going to remove soon.
 	boolean exitWhereFacing;
 
+	Vector seatingPosition;
+
 	List<World> disabledWorlds = new ArrayList<>();
 
 	public void reload(RFChairs plugin) {
@@ -133,6 +132,8 @@ public class ChairManager implements Listener {
 		trapSeats = config.getBoolean("allow-trap-door-chairs", true);
 		requireEmptyHand = config.getBoolean("require-empty-hand", false);
 
+		seatingPosition = config.getVector("seating-position", new Vector(0.5,0.25,0.5));
+
 		disabledWorlds = config.getStringList("disabled-worlds").stream()
 				.map(Bukkit::getWorld)
 				.filter(Objects::nonNull)
@@ -148,6 +149,11 @@ public class ChairManager implements Listener {
 		
 		if (plugin.hasWorldGuard()) if (!plugin.getWorldGuardManager().validateSeating(chair, event.getPlayer())) {
 			Util.callEvent(new MessageEvent(MessageType.WORLDGUARD, event.getPlayer()));
+			return;
+		}
+
+		if (plugin.hasPlotSquared()) if (!plugin.getPlotSquaredManager().canSit(chair.getLocation())) {
+			Util.callEvent(new MessageEvent(MessageType.PLOTSQUARED, event.getPlayer()));
 			return;
 		}
 		
@@ -426,14 +432,14 @@ public class ChairManager implements Listener {
         if (player.hasPermission("rfchairs.notify")) {
         	Object[] updates = Updater.getLastUpdate();
     		if (updates.length == 2) {
-    			player.sendMessage("§6[§eRifle's Chairs§6] New update avaible:");
-    		    player.sendMessage("§6New version: §e" + updates[0]);
-    		    player.sendMessage("§6Your version: §e" + plugin.getDescription().getVersion());
-    		    player.sendMessage("§6What's new: §e" + updates[1]);
+    			player.sendMessage("Â§6[Â§eRifle's ChairsÂ§6] New update available:");
+				player.sendMessage("Â§6New version: Â§e" + updates[0]);
+				player.sendMessage("Â§6Your version: Â§e" + plugin.getDescription().getVersion());
+				player.sendMessage("Â§6What's new: Â§e" + updates[1]);
     		} else {
     			if (!disableCurrentUpdate) {
-    				player.sendMessage("§8[§6Rifle's Chairs§8]: §6Your version: §e" + plugin.getDescription().getVersion());
-        	        player.sendMessage("§8[§6Rifle's Chairs§8]: §aYou are up to date!");
+					player.sendMessage("Â§8[Â§6Rifle's ChairsÂ§8]: Â§6Your version: Â§e" + plugin.getDescription().getVersion());
+					player.sendMessage("Â§8[Â§6Rifle's ChairsÂ§8]: Â§aYou are up to date!");
     			}
             }
         }
@@ -492,7 +498,7 @@ public class ChairManager implements Listener {
 		if (chair == null || chair.isOccupied()) return false;
 		
 		ArmorStand fakeSeat = chair.getFakeSeat();
-		if (fakeSeat == null) fakeSeat = Util.generateFakeSeat(chair);
+		if (fakeSeat == null) fakeSeat = Util.generateFakeSeat(chair, seatingPosition);
 		
 		fakeSeat.addPassenger(player);
 		chair.setFakeSeat(fakeSeat);
