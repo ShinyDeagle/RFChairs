@@ -23,7 +23,7 @@ public class ResetCommand extends SubCommand {
     
     @Override
 	public void onCommand(ConsoleCommandSender sender, String[] args) {
-		plugin.chairManager.clearFakeSeats(plugin);
+		plugin.chairManager.clearFakeSeats();
 		plugin.chairManager.clearFakeSeatsFromFile(plugin);
 		plugin.getLogger().info("Chairs Reset!");
 		sender.sendMessage(ChatColor.DARK_GRAY + "[" + ChatColor.GOLD + "Rifle's Chairs" + ChatColor.DARK_GRAY + "] " + ChatColor.GREEN + "Chairs Reset");
@@ -32,7 +32,7 @@ public class ResetCommand extends SubCommand {
 	@Override
 	public void onCommand(Player player, String[] args) {
 		if (!player.hasPermission("rfchairs.reset") && !player.hasPermission("rfchairs.manage")) return;
-		plugin.chairManager.clearFakeSeats(plugin);
+		plugin.chairManager.clearFakeSeats();
 		plugin.chairManager.clearFakeSeatsFromFile(plugin);
 		plugin.getLogger().info("Chairs Reset!");
 		player.sendMessage(ChatColor.DARK_GRAY + "[" + ChatColor.GOLD + "Rifle's Chairs" + ChatColor.DARK_GRAY + "] " + ChatColor.GREEN + "Chairs Reset");

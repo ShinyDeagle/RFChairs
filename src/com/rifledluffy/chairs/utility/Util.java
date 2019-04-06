@@ -252,8 +252,31 @@ public class Util {
 
 		if (Util.isCarpetBlock(chair.getBlock().getType())) seatingPosition.setY(seatingPosition.getY() - 0.25);
 
+		//Thank you VicenteRD and carlpoole!
 		return seat.getWorld().spawn(
-				seat.add(seatingPosition).setDirection(vector),
+				seat.clone().add(seatingPosition).setDirection(vector),
+				ArmorStand.class,
+				stand -> {
+					stand.setVisible(false);
+					stand.setGravity(false);
+					stand.setInvulnerable(true);
+					stand.setMarker(true);
+					stand.setCollidable(false);
+				});
+	}
+
+	public static ArmorStand generateFakeSeat(Chair chair, Vector seatingPosition, Vector dir) {
+		if (chair == null) return null;
+		Location seat = chair.getLocation();
+		Location playerLoc = chair.getPlayer().getEyeLocation();
+		playerLoc.setPitch(0);
+
+		if (Util.isCarpetBlock(chair.getBlock().getType())) seatingPosition.setY(seatingPosition.getY() - 0.25);
+
+
+		//Thank you VicenteRD and carlpoole!
+		return seat.getWorld().spawn(
+				seat.clone().add(seatingPosition).setDirection(dir),
 				ArmorStand.class,
 				stand -> {
 					stand.setVisible(false);

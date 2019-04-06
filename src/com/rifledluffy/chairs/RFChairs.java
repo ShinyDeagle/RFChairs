@@ -2,10 +2,9 @@ package com.rifledluffy.chairs;
 
 import java.io.IOException;
 
+import com.rifledluffy.chairs.managers.GriefPreventionManager;
 import com.rifledluffy.chairs.managers.PlotSquaredManager;
-import com.sk89q.worldedit.math.BlockVector3;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.rifledluffy.chairs.command.CommandManager;
@@ -24,6 +23,7 @@ public class RFChairs extends JavaPlugin {
 	public MessageManager messageManager;
 	public WorldGuardManager worldGuardManager;
 	public PlotSquaredManager plotSquaredManager;
+	public GriefPreventionManager griefPreventionManager;
 	
 	public String updateMessage;
 	
@@ -34,7 +34,21 @@ public class RFChairs extends JavaPlugin {
 	public void onLoad() {
 		setInstance(this);
 		loadWorldGuard();
+		loadPlotSquared();
+		loadGriefPrevention();
 	}
+
+	private void loadGriefPrevention() {
+		try {
+			Class.forName("me.ryanhamshire.GriefPrevention.GriefPrevention");
+			griefPreventionManager = new GriefPreventionManager();
+			griefPreventionManager.setup();
+			getLogger().info("Found PlotSquared! Bypassing Seating in Admin Claims...");
+		} catch (ClassNotFoundException e) {
+			getLogger().info("GriefPrevention was not found! Disabling Admin Claim Bypass...");
+		}
+	}
+
 
 	private void loadPlotSquared() {
 		try {
@@ -43,7 +57,6 @@ public class RFChairs extends JavaPlugin {
 			plotSquaredManager.setup();
 			getLogger().info("Found PlotSquared! Applying Custom Flag...");
 		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
 			getLogger().info("PlotSquared was not found! Disabling Custom Flag Features...");
 		}
 	}
@@ -95,7 +108,7 @@ public class RFChairs extends JavaPlugin {
 		chairManager.saveToggled();
 		messageManager.saveMuted();
 		
-		chairManager.shutdown(this);
+		chairManager.shutdown();
 		
 		getLogger().info("Saving Configuration Files!");
 		cfgManager.saveData();
@@ -140,6 +153,10 @@ public class RFChairs extends JavaPlugin {
 		return plotSquaredManager;
 	}
 
+	public GriefPreventionManager getGriefPreventionManager() {
+		return griefPreventionManager;
+	}
+
 	private static void setInstance(RFChairs instance) {
     	RFChairs.instance = instance;
     }
@@ -154,6 +171,10 @@ public class RFChairs extends JavaPlugin {
 
 	boolean hasPlotSquared() {
 		return plotSquaredManager != null;
+	}
+
+	boolean hasGriefPrevention() {
+		return griefPreventionManager != null;
 	}
 
 }

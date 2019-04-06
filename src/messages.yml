@@ -49,4 +49,5 @@ priority-replaced: "&8[&6Rifle's Chairs&8] &cYou forcibly tossed to make space f
 no-sign-at-ends: "&8[&6Rifle's Chairs&8] &cThis seat &8[&7which is a stair&8]&c doesn't have signs on both its ends!"
 denied-by-worldguard: "&8[&6Rifle's Chairs&8] &cYou may not sit in this region!"
 denied-by-plotsquared: "&8[&6Rifle's Chairs&8] &cYou may not sit in this plot!"
+denied-by-griefprevention: "&8[&6Rifle's Chairs&8] &cYou may not sit in this claim!"
 

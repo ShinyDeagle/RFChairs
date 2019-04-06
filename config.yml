@@ -1,7 +1,13 @@
 # Rifle's Chair plugin by Rifle D. Luffy
-# Version 4.5
+# Version 5.0
 # #=============[Seat Configuration]=============##
-# seating-position: The exact positions of where the armorstand spawns; default 0.5,0.25,0.5
+# seating-position: The exact positions of where the armorstand spawns; default 0.35,0.3,0.5
+# be careful when playing around with this feature!
+# in the format x,y,z where...
+# x is forward
+# y is up
+# z is sideways (positive z is to the right, negative z is the left)
+#
 # exit-seat-where-facing: Exit the seat where you are facing.
 # max-distance: the maximum distance a player can be in order to sit on the seat
 # max-item-count-to-sit: If they have more than this, they can't sit. Example: >10 dirt cannot sit
@@ -24,7 +30,7 @@
 # regen-potency: the regen potion effect level where 0 is level 1
 # allow-custom-messages: allow the use of custom messages when events are triggered
 # allowed-chairs: The chairs that people are allowed to sit on
-seating-position: 0.5,0.25,0.5
+seating-position: 0.35,0.3,0.5
 disable-update-message-if-on-latest: false
 disable-update-messages: false
 exit-seat-where-facing: false
