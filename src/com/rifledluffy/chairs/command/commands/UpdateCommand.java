@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 
 import com.rifledluffy.chairs.RFChairs;
 import com.rifledluffy.chairs.updating.Updater;
+import org.bukkit.scheduler.BukkitRunnable;
 
 public class UpdateCommand extends SubCommand {
 	
@@ -22,31 +23,43 @@ public class UpdateCommand extends SubCommand {
     
     @Override
 	public void onCommand(ConsoleCommandSender sender, String[] args) {
-    	Object[] updates = Updater.getLastUpdate();
-		if (updates.length == 2) {
-			sender.sendMessage("§6[§eRifle's Chairs§6] New update available:");
-		    sender.sendMessage("§6New version: §e" + updates[0]);
-		    sender.sendMessage("§6Your version: §e" + plugin.getDescription().getVersion());
-		    sender.sendMessage("§6What's new: §e" + updates[1]);
-		} else {
-		    sender.sendMessage("§8[§6Rifle's Chairs§8]: §6Your version: §e" + plugin.getDescription().getVersion());
-	        sender.sendMessage("§8[§6Rifle's Chairs§8]: §aYou are up to date!");
-	    }
+		BukkitRunnable update = new BukkitRunnable() {
+			@Override
+			public void run() {
+				Object[] updates = Updater.getLastUpdate();
+				if (updates.length == 2) {
+					sender.sendMessage("§6[§eRifle's Chairs§6] New update available:");
+					sender.sendMessage("§6New version: §e" + updates[0]);
+					sender.sendMessage("§6Your version: §e" + plugin.getDescription().getVersion());
+					sender.sendMessage("§6What's new: §e" + updates[1]);
+				} else {
+					sender.sendMessage("§8[§6Rifle's Chairs§8]: §6Your version: §e" + plugin.getDescription().getVersion());
+					sender.sendMessage("§8[§6Rifle's Chairs§8]: §aYou are up to date!");
+				}
+			}
+		};
+		update.runTaskAsynchronously(RFChairs.getInstance());
 	}
 	
 	@Override
     public void onCommand(Player player, String[] args) {
 		if (!player.hasPermission("rfchairs.update") && !player.hasPermission("rfchairs.manage")) return;
-		Object[] updates = Updater.getLastUpdate();
-		if (updates.length == 2) {
-			player.sendMessage("§6[§eRifle's Chairs§6] New update available:");
-		    player.sendMessage("§6New version: §e" + updates[0]);
-		    player.sendMessage("§6Your version: §e" + plugin.getDescription().getVersion());
-		    player.sendMessage("§6What's new: §e" + updates[1]);
-		} else {
-		    player.sendMessage("§8[§6Rifle's Chairs§8]: §6Your version: §e" + plugin.getDescription().getVersion());
-	        player.sendMessage("§8[§6Rifle's Chairs§8]: §aYou are up to date!");
-	    }
+		BukkitRunnable update = new BukkitRunnable() {
+			@Override
+			public void run() {
+				Object[] updates = Updater.getLastUpdate();
+				if (updates.length == 2) {
+					player.sendMessage("§6[§eRifle's Chairs§6] New update available:");
+					player.sendMessage("§6New version: §e" + updates[0]);
+					player.sendMessage("§6Your version: §e" + plugin.getDescription().getVersion());
+					player.sendMessage("§6What's new: §e" + updates[1]);
+				} else {
+					player.sendMessage("§8[§6Rifle's Chairs§8]: §6Your version: §e" + plugin.getDescription().getVersion());
+					player.sendMessage("§8[§6Rifle's Chairs§8]: §aYou are up to date!");
+				}
+			}
+		};
+		update.runTaskAsynchronously(RFChairs.getInstance());
     }
 
     @Override

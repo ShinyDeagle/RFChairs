@@ -1,13 +1,20 @@
 package com.rifledluffy.chairs;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
+import com.rifledluffy.chairs.chairs.CarpetBlock;
+import com.rifledluffy.chairs.chairs.Chair;
+import com.rifledluffy.chairs.chairs.SlabBlock;
+import com.rifledluffy.chairs.chairs.StairBlock;
+import com.rifledluffy.chairs.config.ConfigManager;
+import com.rifledluffy.chairs.events.ChairCheckEvent;
+import com.rifledluffy.chairs.events.ChairLeaveEvent;
+import com.rifledluffy.chairs.events.ChairReplaceEvent;
+import com.rifledluffy.chairs.events.ChairSitEvent;
+import com.rifledluffy.chairs.events.ChairTossEvent;
+import com.rifledluffy.chairs.messages.MessageConstruct;
+import com.rifledluffy.chairs.messages.MessageEvent;
+import com.rifledluffy.chairs.messages.MessageType;
+import com.rifledluffy.chairs.updating.Updater;
+import com.rifledluffy.chairs.utility.Util;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -45,18 +52,13 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.spigotmc.event.entity.EntityDismountEvent;
 
-import com.rifledluffy.chairs.chairs.Chair;
-import com.rifledluffy.chairs.config.ConfigManager;
-import com.rifledluffy.chairs.events.ChairCheckEvent;
-import com.rifledluffy.chairs.events.ChairLeaveEvent;
-import com.rifledluffy.chairs.events.ChairReplaceEvent;
-import com.rifledluffy.chairs.events.ChairSitEvent;
-import com.rifledluffy.chairs.events.ChairTossEvent;
-import com.rifledluffy.chairs.messages.MessageConstruct;
-import com.rifledluffy.chairs.messages.MessageEvent;
-import com.rifledluffy.chairs.messages.MessageType;
-import com.rifledluffy.chairs.updating.Updater;
-import com.rifledluffy.chairs.utility.Util;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class ChairManager implements Listener {
 	
@@ -105,7 +107,9 @@ public class ChairManager implements Listener {
 	//Mostly buggy, probably going to remove soon.
 	private boolean exitWhereFacing;
 
-	private Vector seatingPosition;
+	public Vector stairSeatingPosition;
+	public Vector slabSeatingPosition;
+	public Vector carpetSeatingPosition;
 
 	private List<World> disabledWorlds = new ArrayList<>();
 
@@ -135,11 +139,25 @@ public class ChairManager implements Listener {
 		requireEmptyHand = config.getBoolean("require-empty-hand", false);
 
 		try {
-			String[] vectorString = config.getString("seating-position", "0.5,0.25,0.5").split(",");
-			seatingPosition = new Vector(Double.parseDouble(vectorString[0]), Double.parseDouble(vectorString[1]), Double.parseDouble(vectorString[2]));
+			String[] vectorString = config.getString("stair-seating-position", "0.5,0.3,0.5").split(",");
+			stairSeatingPosition = new Vector(Double.parseDouble(vectorString[0]), Double.parseDouble(vectorString[1]), Double.parseDouble(vectorString[2]));
 		} catch (NumberFormatException e) {
-			seatingPosition = new Vector(0.5,0.25D,0.5);
+			stairSeatingPosition = new Vector(0.5D,0.3D,0.5);
 		}
+
+        try {
+            String[] vectorString = config.getString("slab-seating-position", "0.5,0.3,0.5").split(",");
+            slabSeatingPosition = new Vector(Double.parseDouble(vectorString[0]), Double.parseDouble(vectorString[1]), Double.parseDouble(vectorString[2]));
+        } catch (NumberFormatException e) {
+            slabSeatingPosition= new Vector(0.5,0.3D,0.5);
+        }
+
+        try {
+            String[] vectorString = config.getString("carpet-seating-position", "0.5,-0.15,0.5").split(",");
+            carpetSeatingPosition = new Vector(Double.parseDouble(vectorString[0]), Double.parseDouble(vectorString[1]), Double.parseDouble(vectorString[2]));
+        } catch (NumberFormatException e) {
+            carpetSeatingPosition= new Vector(0.5,-0.15D,0.5);
+        }
 
 		disabledWorlds = config.getStringList("disabled-worlds").stream()
 				.map(Bukkit::getWorld)
@@ -156,11 +174,6 @@ public class ChairManager implements Listener {
 		
 		if (plugin.hasWorldGuard()) if (!plugin.getWorldGuardManager().validateSeating(chair, event.getPlayer())) {
 			Util.callEvent(new MessageEvent(MessageType.WORLDGUARD, event.getPlayer()));
-			return;
-		}
-
-		if (plugin.hasPlotSquared()) if (!plugin.getPlotSquaredManager().canSit(chair)) {
-			Util.callEvent(new MessageEvent(MessageType.PLOTSQUARED, event.getPlayer()));
 			return;
 		}
 		
@@ -299,13 +312,15 @@ public class ChairManager implements Listener {
 			if (player.hasPermission("rfchairs.priority") && priorityIfHasPerm) {
 				ChairReplaceEvent replaceEvent = new ChairReplaceEvent(chair, chair.getPlayer(), player);
 				Util.callEvent(replaceEvent);
+				return;
 			}
+			if (chair.getPlayer() == null) return;
 			if (player.getUniqueId().equals(chair.getPlayer().getUniqueId())) {
 				orienting.add(player.getUniqueId());
 				Location loc = chair.getFakeSeat().getLocation();
 				loc.setDirection(player.getEyeLocation().getDirection().setY(0));
 				chair.getFakeSeat().remove();
-				ArmorStand newFakeSeat = Util.generateFakeSeat(chair, seatingPosition, loc.getDirection());
+				ArmorStand newFakeSeat = Util.generateFakeSeatDir(chair, loc.getDirection());
 				chair.setFakeSeat(newFakeSeat);
 				chair.getFakeSeat().addPassenger(player);
 			} else {
@@ -318,11 +333,7 @@ public class ChairManager implements Listener {
 	@EventHandler
 	public void onRightClick(PlayerInteractEvent event) {
 		if (disabledWorlds.size() > 0 && disabledWorlds.contains(event.getPlayer().getWorld())) return;
-
-		if (event.isCancelled() && plugin.hasGriefPrevention() && event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-		    if (!plugin.getGriefPreventionManager().isAdminClaim(event.getClickedBlock().getLocation())) return;
-        } else if (event.isCancelled()) return;
-
+		if (event.isCancelled()) return;
 		if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
 		if (event.getPlayer().isSneaking()) return;
 		if (event.getHand() != EquipmentSlot.HAND) return;
@@ -339,12 +350,12 @@ public class ChairManager implements Listener {
 			if (item.getType().isBlock()) return;
 		}
 		
-		if (!Util.isStairBlock(block.getType())
-			&& !Util.isSlabBlock(block.getType())
-			&& !Util.isCarpetBlock(block.getType())) return;
+		if (!StairBlock.isBlock(block.getType())
+			&& !CarpetBlock.isBlock(block.getType())
+			&& !SlabBlock.isBlock(block.getType())) return;
 		
-		if (Util.isStairBlock(block.getType())) {
-			if (!Util.validateStair(block)) return;
+		if (StairBlock.isBlock(block.getType())) {
+			if (!Util.validStair(block)) return;
 			else {
 				if (checkForSigns) {
 					if (!Util.validCouch(block)) {
@@ -361,9 +372,9 @@ public class ChairManager implements Listener {
 			}
 		} else if (block.getRelative(BlockFace.UP).getType() != Material.AIR) return;
 		
-		if (Util.isSlabBlock(block.getType())) if (!Util.validateSlab(block)) return;
+		if (SlabBlock.isBlock(block.getType())) if (!Util.validSlab(block)) return;
 		
-		if (Util.isCarpetBlock(block.getType())) if (!Util.validateCarpet(block)) return;
+		if (CarpetBlock.isBlock(block.getType())) if (!Util.validCarpet(block)) return;
 		
 		if (event.getBlockFace() == BlockFace.DOWN) return;
 		
@@ -458,18 +469,24 @@ public class ChairManager implements Listener {
         Player player = event.getPlayer();
         if (disableUpdates) return;
         if (player.hasPermission("rfchairs.notify")) {
-        	Object[] updates = Updater.getLastUpdate();
-    		if (updates.length == 2) {
-    			player.sendMessage("§6[§eRifle's Chairs§6] New update available:");
-				player.sendMessage("§6New version: §e" + updates[0]);
-				player.sendMessage("§6Your version: §e" + plugin.getDescription().getVersion());
-				player.sendMessage("§6What's new: §e" + updates[1]);
-    		} else {
-    			if (!disableCurrentUpdate) {
-					player.sendMessage("§8[§6Rifle's Chairs§8]: §6Your version: §e" + plugin.getDescription().getVersion());
-					player.sendMessage("§8[§6Rifle's Chairs§8]: §aYou are up to date!");
-    			}
-            }
+			BukkitRunnable update = new BukkitRunnable() {
+				@Override
+				public void run() {
+					Object[] updates = Updater.getLastUpdate();
+					if (updates.length == 2) {
+						player.sendMessage("§6[§eRifle's Chairs§6] New update available:");
+						player.sendMessage("§6New version: §e" + updates[0]);
+						player.sendMessage("§6Your version: §e" + plugin.getDescription().getVersion());
+						player.sendMessage("§6What's new: §e" + updates[1]);
+					} else {
+						if (!disableCurrentUpdate) {
+							player.sendMessage("§8[§6Rifle's Chairs§8]: §6Your version: §e" + plugin.getDescription().getVersion());
+							player.sendMessage("§8[§6Rifle's Chairs§8]: §aYou are up to date!");
+						}
+					}
+				}
+			};
+			update.runTaskAsynchronously(RFChairs.getInstance());
         }
     }
 
@@ -526,7 +543,7 @@ public class ChairManager implements Listener {
 		if (chair == null || chair.isOccupied()) return false;
 		
 		ArmorStand fakeSeat = chair.getFakeSeat();
-		if (fakeSeat == null) fakeSeat = Util.generateFakeSeat(chair, seatingPosition);
+		if (fakeSeat == null) fakeSeat = Util.generateFakeSeat(chair);
 
 		fakeSeat.addPassenger(player);
 		chair.setFakeSeat(fakeSeat);
@@ -590,10 +607,11 @@ public class ChairManager implements Listener {
 		List<String> toggled = configManager.getData().getStringList("Toggled");
 		if (toggled == null || toggled.size() == 0) return;
 		plugin.getServer().getLogger().info("[RFChairs] " + toggled.size() + " Players had toggled off. Adding Them...");
-		for (String toggler : toggled) {
-			UUID id = UUID.fromString(toggler);
-			this.toggled.add(id);
-		}
+
+		toggled.stream()
+				.map(UUID::fromString)
+				.forEach(id -> this.toggled.add(id));
+
 		configManager.getData().set("Toggled", new ArrayList<String>());
 	}
 	

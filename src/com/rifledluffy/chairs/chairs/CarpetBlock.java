@@ -2,45 +2,17 @@ package com.rifledluffy.chairs.chairs;
 
 import org.bukkit.Material;
 
-public enum CarpetBlock {
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
-    BLACK("black_carpet"),
-    BLUE("blue_carpet"),
-    BROWN("brown_carpet"),
-    CYAN("cyan_carpet"),
-    GRAY("gray_carpet"),
-    GREEN("green_carpet"),
-    LIGHT_BLUE("light_blue_carpet"),
-    LIGHT_GRAY("light_gray_carpet"),
-    LIME("lime_carpet"),
-    MAGENTA("magenta_carpet"),
-    ORANGE("orange_carpet"),
-    PINK("pink_carpet"),
-    PURPLE("purple_carpet"),
-    RED("red_carpet"),
-	WHITE("white_carpet"),
-	YELLOW("yellow_carpet");
+public class CarpetBlock extends BlockFilter {
 
-    final private String name;
-
-    CarpetBlock(String name) {
-        this.name = name;
+    public final void init() {
+        TYPE_SUFFIX = "_CARPET";
+        validMats = Arrays.stream(Material.values())
+                .filter(mat -> mat.name().contains(TYPE_SUFFIX))
+                .filter(mat -> !mat.name().contains("LEGACY_"))
+                .collect(Collectors.toList());
     }
 
-    public static String from(Material mat) {
-        for (CarpetBlock carpet : values()) {
-            if (carpet.getName().equalsIgnoreCase(mat.name())) {
-                return carpet.getName();
-            }
-        }
-        return "null";
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public static CarpetBlock[] getList() {
-    	return values();
-    }
 }

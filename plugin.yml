@@ -1,10 +1,10 @@
 main: com.rifledluffy.chairs.RFChairs
 name: RFChairs
-version: 5.0
+version: 6.0
 authors: [Rifle D. Luffy, VicenteRD, carlpoole]
 api-version: 1.13
 description: Chairs but Rifle's way.
-softdepend: [WorldGuard, WorldEdit, PlotSquared]
+softdepend: [WorldGuard, WorldEdit]
 commands:
   rfchairs:
     usage: /<command>
@@ -41,3 +41,6 @@ permissions:
     children:
       rfchairs.reload: true
       rfchairs.reset: true
+      rfchairs.update: true
+      rfchairs.manage: true
+      rfchairs.use: true

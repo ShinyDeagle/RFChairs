@@ -2,8 +2,6 @@ package com.rifledluffy.chairs;
 
 import java.io.IOException;
 
-import com.rifledluffy.chairs.managers.GriefPreventionManager;
-import com.rifledluffy.chairs.managers.PlotSquaredManager;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -22,8 +20,6 @@ public class RFChairs extends JavaPlugin {
 	public ChairManager chairManager;
 	public MessageManager messageManager;
 	public WorldGuardManager worldGuardManager;
-	public PlotSquaredManager plotSquaredManager;
-	public GriefPreventionManager griefPreventionManager;
 	
 	public String updateMessage;
 	
@@ -34,31 +30,6 @@ public class RFChairs extends JavaPlugin {
 	public void onLoad() {
 		setInstance(this);
 		loadWorldGuard();
-		loadPlotSquared();
-		loadGriefPrevention();
-	}
-
-	private void loadGriefPrevention() {
-		try {
-			Class.forName("me.ryanhamshire.GriefPrevention.GriefPrevention");
-			griefPreventionManager = new GriefPreventionManager();
-			griefPreventionManager.setup();
-			getLogger().info("Found PlotSquared! Bypassing Seating in Admin Claims...");
-		} catch (ClassNotFoundException e) {
-			getLogger().info("GriefPrevention was not found! Disabling Admin Claim Bypass...");
-		}
-	}
-
-
-	private void loadPlotSquared() {
-		try {
-			Class.forName("com.github.intellectualsites.plotsquared.api.PlotAPI");
-			plotSquaredManager = new PlotSquaredManager();
-			plotSquaredManager.setup();
-			getLogger().info("Found PlotSquared! Applying Custom Flag...");
-		} catch (ClassNotFoundException e) {
-			getLogger().info("PlotSquared was not found! Disabling Custom Flag Features...");
-		}
 	}
 
 	private void loadWorldGuard() {
@@ -113,8 +84,7 @@ public class RFChairs extends JavaPlugin {
 		getLogger().info("Saving Configuration Files!");
 		cfgManager.saveData();
 
-		Bukkit.getOnlinePlayers().stream()
-				.forEach(p -> {
+		Bukkit.getOnlinePlayers().forEach(p -> {
 					PotionEffect regen = p.getPotionEffect(PotionEffectType.REGENERATION);
 					if (regen == null) return;
 					if (regen.getDuration() > 1000) p.removePotionEffect(PotionEffectType.REGENERATION);
@@ -149,14 +119,6 @@ public class RFChairs extends JavaPlugin {
 		return this.worldGuardManager;
 	}
 
-	public PlotSquaredManager getPlotSquaredManager() {
-		return plotSquaredManager;
-	}
-
-	public GriefPreventionManager getGriefPreventionManager() {
-		return griefPreventionManager;
-	}
-
 	private static void setInstance(RFChairs instance) {
     	RFChairs.instance = instance;
     }
@@ -167,14 +129,6 @@ public class RFChairs extends JavaPlugin {
 
 	boolean hasWorldGuard() {
 		return worldGuardManager != null;
-	}
-
-	boolean hasPlotSquared() {
-		return plotSquaredManager != null;
-	}
-
-	boolean hasGriefPrevention() {
-		return griefPreventionManager != null;
 	}
 
 }

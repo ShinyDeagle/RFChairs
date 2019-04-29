@@ -1,11 +1,11 @@
 package com.rifledluffy.chairs.utility;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-
+import com.rifledluffy.chairs.RFChairs;
+import com.rifledluffy.chairs.chairs.CarpetBlock;
+import com.rifledluffy.chairs.chairs.Chair;
+import com.rifledluffy.chairs.chairs.SlabBlock;
+import com.rifledluffy.chairs.chairs.StairBlock;
+import com.rifledluffy.chairs.config.ConfigManager;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -20,18 +20,16 @@ import org.bukkit.block.data.type.TrapDoor;
 import org.bukkit.block.data.type.WallSign;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.util.Vector;
 
-import com.rifledluffy.chairs.RFChairs;
-import com.rifledluffy.chairs.chairs.CarpetBlock;
-import com.rifledluffy.chairs.chairs.Chair;
-import com.rifledluffy.chairs.chairs.SlabBlock;
-import com.rifledluffy.chairs.chairs.StairBlock;
-import com.rifledluffy.chairs.config.ConfigManager;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 public class Util {
 	
@@ -52,11 +50,6 @@ public class Util {
 
 	public static void debug(List<Object> messages) {
 		messages.forEach(Util::debug);
-	}
-	
-	public static boolean isStairBlock(Material material) {
-		if (StairBlock.from(material) == "null") return false;
-		return true;
 	}
 	
 	public static String replaceMessage(Player player, String string) {
@@ -90,51 +83,24 @@ public class Util {
 		return string;
 	}
 	
-	public static boolean isSlabBlock(Material material) {
-		return !SlabBlock.from(material).equals("null");
-	}
-	
-	public static boolean isCarpetBlock(Material material) {
-		return !CarpetBlock.from(material).equals("null");
-	}
-	
-	public static boolean validateStair(Block block) {
-		List<String> whitelist = plugin.getConfig().getStringList("allowed-chairs");
-		List<String> blacklist = plugin.getConfig().getStringList("blacklisted-chairs");
-		boolean found = false;
-		for (String white : whitelist) if (white.equalsIgnoreCase(StairBlock.from(block.getType()))) found = true;
-		for (String black : blacklist) if (black.equalsIgnoreCase(StairBlock.from(block.getType()))) found = false;
-		if (!found) return false;
+	public static boolean validStair(Block block) {
+		if (!StairBlock.validate(block.getType())) return false;
 		Stairs stair = (Stairs) block.getState().getBlockData();
-		if (stair.getHalf() == Bisected.Half.TOP) return false;
-		return true;
+		return stair.getHalf() != Bisected.Half.TOP;
 	}
 	
-	public static boolean validateSlab(Block block) {
-		List<String> whitelist = plugin.getConfig().getStringList("allowed-chairs");
-		List<String> blacklist = plugin.getConfig().getStringList("blacklisted-chairs");
-		boolean found = false;
-		for (String white : whitelist) if (white.equalsIgnoreCase(SlabBlock.from(block.getType()))) found = true;
-		for (String black : blacklist) if (black.equalsIgnoreCase(SlabBlock.from(block.getType()))) found = false;
-		if (!found) return false;
+	public static boolean validSlab(Block block) {
+		if (!SlabBlock.validate(block.getType())) return false;
 		Slab slab = (Slab) block.getState().getBlockData();
-		if (slab.getType() != Slab.Type.BOTTOM) return false;
-		return true;
+		return slab.getType() == Slab.Type.BOTTOM;
 	}
 
-	public static boolean validateCarpet(Block block) {
-		List<String> whitelist = plugin.getConfig().getStringList("allowed-chairs");
-		List<String> blacklist = plugin.getConfig().getStringList("blacklisted-chairs");
-		boolean found = false;
-		for (String white : whitelist) if (white.equalsIgnoreCase(CarpetBlock.from(block.getType()))) found = true;
-		for (String black : blacklist) if (black.equalsIgnoreCase(CarpetBlock.from(block.getType()))) found = false;
-		if (!found) return false;
-		return true;
+	public static boolean validCarpet(Block block) {
+		return CarpetBlock.validate(block.getType());
 	}
 	
-	public static boolean validatedChair(Block block) {
-		if (isStairBlock(block.getType())) return validateStair(block);
-		return false;
+	private static boolean validatedChair(Block block) {
+		return StairBlock.isBlock(block.getType()) && validStair(block);
 	}
 	
 	public static boolean playerIsSeated(UUID uuid, Map<UUID, Chair> chairMap) {
@@ -156,7 +122,7 @@ public class Util {
 				&& !validExit(block.getRelative(BlockFace.WEST));
 	}
 	
-	public static boolean validExit(Block block) {
+	private static boolean validExit(Block block) {
 		return block.getType() == Material.AIR || block.getType() == Material.WALL_SIGN;
 	}
 	
@@ -239,18 +205,21 @@ public class Util {
 		return null;
 	}
 	
-	public static ArmorStand generateFakeSeat(Chair chair, Vector seatingPosition) {
+	public static ArmorStand generateFakeSeat(Chair chair) {
 		if (chair == null) return null;
+		Vector seatingPosition = new Vector(0.5,0.3D,0.5);
 		Location seat = chair.getLocation();
 		BlockFace facing = null;
-		if (Util.isStairBlock(chair.getBlock().getType())) facing = ((Stairs)chair.getBlock().getState().getBlockData()).getFacing();
+		if (StairBlock.isBlock(chair.getBlock().getType())) facing = ((Stairs)chair.getBlock().getState().getBlockData()).getFacing();
 		Location playerLoc = chair.getPlayer().getEyeLocation();
 		playerLoc.setPitch(0);
 		Vector vector;
 		if (facing != null) vector = getVectorFromFace(chair.getBlock(), facing.getOppositeFace());
-		else vector = getVectorFromNearBlock(chair.getBlock(),playerLoc.getBlock());
+		else vector = getVectorFromNearBlock(chair.getBlock(), playerLoc.getBlock());
 
-		if (Util.isCarpetBlock(chair.getBlock().getType())) seatingPosition.setY(seatingPosition.getY() - 0.25);
+        if (StairBlock.isBlock(chair.getBlock().getType())) seatingPosition = plugin.chairManager.stairSeatingPosition;
+        if (CarpetBlock.isBlock(chair.getBlock().getType())) seatingPosition = plugin.chairManager.carpetSeatingPosition;
+        if (SlabBlock.isBlock(chair.getBlock().getType())) seatingPosition = plugin.chairManager.slabSeatingPosition;
 
 		//Thank you VicenteRD and carlpoole!
 		return seat.getWorld().spawn(
@@ -265,14 +234,16 @@ public class Util {
 				});
 	}
 
-	public static ArmorStand generateFakeSeat(Chair chair, Vector seatingPosition, Vector dir) {
+	public static ArmorStand generateFakeSeatDir(Chair chair, Vector dir) {
 		if (chair == null) return null;
+		Vector seatingPosition = new Vector(0.5,0.3D,0.5);
 		Location seat = chair.getLocation();
 		Location playerLoc = chair.getPlayer().getEyeLocation();
 		playerLoc.setPitch(0);
 
-		if (Util.isCarpetBlock(chair.getBlock().getType())) seatingPosition.setY(seatingPosition.getY() - 0.25);
-
+		if (StairBlock.isBlock(chair.getBlock().getType())) seatingPosition = plugin.chairManager.stairSeatingPosition;
+		if (CarpetBlock.isBlock(chair.getBlock().getType())) seatingPosition = plugin.chairManager.carpetSeatingPosition;
+		if (SlabBlock.isBlock(chair.getBlock().getType())) seatingPosition = plugin.chairManager.slabSeatingPosition;
 
 		//Thank you VicenteRD and carlpoole!
 		return seat.getWorld().spawn(

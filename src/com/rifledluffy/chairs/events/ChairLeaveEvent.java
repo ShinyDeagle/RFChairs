@@ -8,9 +8,9 @@ import com.rifledluffy.chairs.chairs.Chair;
 
 public class ChairLeaveEvent extends Event {
 	
-	Chair chair;
-	Player player;
-	boolean exitWhereFacing = false;
+	private Chair chair;
+	private Player player;
+	private boolean exitWhereFacing = false;
 	
 	public ChairLeaveEvent(Chair chair, Player player, boolean flag) {
 		this.chair = chair;
