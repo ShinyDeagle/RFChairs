@@ -70,7 +70,7 @@ public class Chair {
 	}
 	
 	public BlockFace getFacing() {
-		if (!Util.isStairBlock(chair.getType())) return null;
+		if (!StairBlock.isBlock(chair.getType())) return null;
 		return ((Stairs)chair.getState().getData()).getFacing();
 	}
 	
