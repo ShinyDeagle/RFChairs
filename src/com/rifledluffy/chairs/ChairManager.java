@@ -1,9 +1,7 @@
 package com.rifledluffy.chairs;
 
-import com.rifledluffy.chairs.chairs.CarpetBlock;
+import com.rifledluffy.chairs.chairs.BlockFilter;
 import com.rifledluffy.chairs.chairs.Chair;
-import com.rifledluffy.chairs.chairs.SlabBlock;
-import com.rifledluffy.chairs.chairs.StairBlock;
 import com.rifledluffy.chairs.config.ConfigManager;
 import com.rifledluffy.chairs.events.ChairCheckEvent;
 import com.rifledluffy.chairs.events.ChairLeaveEvent;
@@ -350,11 +348,11 @@ public class ChairManager implements Listener {
 			if (item.getType().isBlock()) return;
 		}
 		
-		if (!StairBlock.isBlock(block.getType())
-			&& !CarpetBlock.isBlock(block.getType())
-			&& !SlabBlock.isBlock(block.getType())) return;
+		if (!BlockFilter.isStairsBlock(block.getType())
+			&& !BlockFilter.isCarpetBlock(block.getType())
+			&& !BlockFilter.isSlabBlock(block.getType())) return;
 		
-		if (StairBlock.isBlock(block.getType())) {
+		if (BlockFilter.isStairsBlock(block.getType())) {
 			if (!Util.validStair(block)) return;
 			else {
 				if (checkForSigns) {
@@ -372,9 +370,9 @@ public class ChairManager implements Listener {
 			}
 		} else if (block.getRelative(BlockFace.UP).getType() != Material.AIR) return;
 		
-		if (SlabBlock.isBlock(block.getType())) if (!Util.validSlab(block)) return;
+		if (BlockFilter.isSlabBlock(block.getType())) if (!Util.validSlab(block)) return;
 		
-		if (CarpetBlock.isBlock(block.getType())) if (!Util.validCarpet(block)) return;
+		if (BlockFilter.isCarpetBlock(block.getType())) if (!Util.validCarpet(block)) return;
 		
 		if (event.getBlockFace() == BlockFace.DOWN) return;
 		

@@ -5,6 +5,7 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
 import com.rifledluffy.chairs.RFChairs;
+import com.rifledluffy.chairs.chairs.BlockFilter;
 import com.rifledluffy.chairs.config.ConfigManager;
 
 import net.md_5.bungee.api.ChatColor;
@@ -40,6 +41,7 @@ public class ReloadCommand extends SubCommand {
 		newConfig.reloadConfig();
 		newConfig.reloadMessages();
 		plugin.setConfigManager(newConfig);
+		BlockFilter.reload();
 		plugin.chairManager.reload(plugin);
 		plugin.messageManager.reload(plugin);
 		player.sendMessage(ChatColor.DARK_GRAY + "[" + ChatColor.GOLD + "Rifle's Chairs" + ChatColor.DARK_GRAY + "] " + ChatColor.GREEN + "Config Reloaded");

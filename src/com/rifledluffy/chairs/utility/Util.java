@@ -1,10 +1,8 @@
 package com.rifledluffy.chairs.utility;
 
 import com.rifledluffy.chairs.RFChairs;
-import com.rifledluffy.chairs.chairs.CarpetBlock;
+import com.rifledluffy.chairs.chairs.BlockFilter;
 import com.rifledluffy.chairs.chairs.Chair;
-import com.rifledluffy.chairs.chairs.SlabBlock;
-import com.rifledluffy.chairs.chairs.StairBlock;
 import com.rifledluffy.chairs.config.ConfigManager;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -84,23 +82,23 @@ public class Util {
 	}
 	
 	public static boolean validStair(Block block) {
-		if (!StairBlock.validate(block.getType())) return false;
+		if (!BlockFilter.validateStairs(block.getType())) return false;
 		Stairs stair = (Stairs) block.getState().getBlockData();
 		return stair.getHalf() != Bisected.Half.TOP;
 	}
 	
 	public static boolean validSlab(Block block) {
-		if (!SlabBlock.validate(block.getType())) return false;
+		if (!BlockFilter.validateSlab(block.getType())) return false;
 		Slab slab = (Slab) block.getState().getBlockData();
 		return slab.getType() == Slab.Type.BOTTOM;
 	}
 
 	public static boolean validCarpet(Block block) {
-		return CarpetBlock.validate(block.getType());
+		return BlockFilter.validateCarpet(block.getType());
 	}
 	
 	private static boolean validatedChair(Block block) {
-		return StairBlock.isBlock(block.getType()) && validStair(block);
+		return BlockFilter.isStairsBlock(block.getType()) && validStair(block);
 	}
 	
 	public static boolean playerIsSeated(UUID uuid, Map<UUID, Chair> chairMap) {
@@ -211,16 +209,16 @@ public class Util {
 		Vector seatingPosition = new Vector(0.5,0.3D,0.5);
 		Location seat = chair.getLocation();
 		BlockFace facing = null;
-		if (StairBlock.isBlock(chair.getBlock().getType())) facing = ((Stairs)chair.getBlock().getState().getBlockData()).getFacing();
+		if (BlockFilter.isStairsBlock(chair.getBlock().getType())) facing = ((Stairs)chair.getBlock().getState().getBlockData()).getFacing();
 		Location playerLoc = chair.getPlayer().getEyeLocation();
 		playerLoc.setPitch(0);
 		Vector vector;
 		if (facing != null) vector = getVectorFromFace(chair.getBlock(), facing.getOppositeFace());
 		else vector = getVectorFromNearBlock(chair.getBlock(), playerLoc.getBlock());
 
-        if (StairBlock.isBlock(chair.getBlock().getType())) seatingPosition = plugin.chairManager.stairSeatingPosition;
-        if (CarpetBlock.isBlock(chair.getBlock().getType())) seatingPosition = plugin.chairManager.carpetSeatingPosition;
-        if (SlabBlock.isBlock(chair.getBlock().getType())) seatingPosition = plugin.chairManager.slabSeatingPosition;
+        if (BlockFilter.isStairsBlock(chair.getBlock().getType())) seatingPosition = plugin.chairManager.stairSeatingPosition;
+        if (BlockFilter.isCarpetBlock(chair.getBlock().getType())) seatingPosition = plugin.chairManager.carpetSeatingPosition;
+        if (BlockFilter.isSlabBlock(chair.getBlock().getType())) seatingPosition = plugin.chairManager.slabSeatingPosition;
 
 		//Thank you VicenteRD and carlpoole!
 		return seat.getWorld().spawn(
@@ -242,9 +240,9 @@ public class Util {
 		Location playerLoc = chair.getPlayer().getEyeLocation();
 		playerLoc.setPitch(0);
 
-		if (StairBlock.isBlock(chair.getBlock().getType())) seatingPosition = plugin.chairManager.stairSeatingPosition;
-		if (CarpetBlock.isBlock(chair.getBlock().getType())) seatingPosition = plugin.chairManager.carpetSeatingPosition;
-		if (SlabBlock.isBlock(chair.getBlock().getType())) seatingPosition = plugin.chairManager.slabSeatingPosition;
+		if (BlockFilter.isStairsBlock(chair.getBlock().getType())) seatingPosition = plugin.chairManager.stairSeatingPosition;
+		if (BlockFilter.isCarpetBlock(chair.getBlock().getType())) seatingPosition = plugin.chairManager.carpetSeatingPosition;
+		if (BlockFilter.isSlabBlock(chair.getBlock().getType())) seatingPosition = plugin.chairManager.slabSeatingPosition;
 
 		//Thank you VicenteRD and carlpoole!
 		return seat.getWorld().spawn(

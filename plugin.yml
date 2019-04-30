@@ -1,7 +1,7 @@
 main: com.rifledluffy.chairs.RFChairs
 name: RFChairs
 version: 6.0
-authors: [Rifle D. Luffy, VicenteRD, carlpoole]
+authors: [Rifle D. Luffy, VicenteRD, carlpoole, i0xHeX]
 api-version: 1.13
 description: Chairs but Rifle's way.
 softdepend: [WorldGuard, WorldEdit]
