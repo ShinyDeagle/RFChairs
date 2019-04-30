@@ -123,7 +123,8 @@ public class Util {
 	}
 	
 	private static boolean validExit(Block block) {
-		return block.getType() == Material.AIR || block.getType() == Material.WALL_SIGN;
+		Material type = block.getType();
+		return type == Material.AIR || type.name().equals("WALL_SIGN") || type.name().endsWith("_WALL_SIGN");
 	}
 	
 	public static boolean isLiqiudOrMagma(Block block) {
