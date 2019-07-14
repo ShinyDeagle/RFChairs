@@ -1,0 +1,72 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>com.rifledluffy</groupId>
+	<artifactId>RiflesChairs</artifactId>
+	<version>6.0-SNAPSHOT</version>
+
+	<description>Chairs, but Rifle's way..</description>
+	<url>https://github.com/RifleDLuffy/RFChairs</url>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
+	</properties>
+
+	<repositories>
+		<repository>
+			<id>spigot-repo</id>
+			<url>https://hub.spigotmc.org/nexus/content/groups/public/</url>
+		</repository>
+		<repository>
+			<id>sk89q-repo</id>
+			<url>http://maven.sk89q.com/repo/</url>
+		</repository>
+		<repository>
+			<id>jitpack.io</id>
+			<url>https://jitpack.io</url>
+		</repository>
+	</repositories>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.spigotmc</groupId>
+			<artifactId>spigot-api</artifactId>
+			<version>1.13.2-R0.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>com.sk89q.worldguard</groupId>
+			<artifactId>worldguard-bukkit</artifactId>
+			<version>7.0.0</version>
+			<type>jar</type>
+		</dependency>
+		<dependency>
+			<groupId>com.github.IntellectualSites</groupId>
+			<artifactId>PlotSquared</artifactId>
+			<version>23b88a375da7587175c6662bdd3d9d96e7fe7060</version>
+		</dependency>
+		<dependency>
+			<groupId>com.github.TechFortress</groupId>
+			<artifactId>GriefPrevention</artifactId>
+			<version>16.12.alpha</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<defaultGoal>clean package</defaultGoal>
+		<sourceDirectory>${basedir}/src</sourceDirectory>
+		<resources>
+			<resource>
+				<targetPath>.</targetPath>
+				<filtering>true</filtering>
+				<directory>${basedir}</directory>
+				<includes>
+					<include>plugin.yml</include>
+					<include>config.yml</include>
+				</includes>
+			</resource>
+		</resources>
+	</build>
+</project>
