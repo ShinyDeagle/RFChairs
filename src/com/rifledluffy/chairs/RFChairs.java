@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.rifledluffy.chairs.chairs.BlockFilter;
 import com.rifledluffy.chairs.command.CommandManager;
 import com.rifledluffy.chairs.config.ConfigManager;
 import com.rifledluffy.chairs.managers.WorldGuardManager;
@@ -20,12 +21,7 @@ public class RFChairs extends JavaPlugin {
 	public ChairManager chairManager;
 	public MessageManager messageManager;
 	public WorldGuardManager worldGuardManager;
-	
-	public String updateMessage;
-	
-	final static String VERSION_URL = "https://api.spiget.org/v2/resources/58809/versions?size=" + Integer.MAX_VALUE + "&spiget__ua=SpigetDocs";
-	final static String DESCRIPTION_URL = "https://api.spiget.org/v2/resources/58809/updates?size=" + Integer.MAX_VALUE + "&spiget__ua=SpigetDocs";
-	
+
 	@Override
 	public void onLoad() {
 		setInstance(this);
@@ -66,6 +62,7 @@ public class RFChairs extends JavaPlugin {
 		messageManager = new MessageManager();
 		messageManager.loadMuted();
 		
+		BlockFilter.reload();
 		chairManager.reload(this);
 		messageManager.reload(this);
 		getServer().getPluginManager().registerEvents(chairManager, this);

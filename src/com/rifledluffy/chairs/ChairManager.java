@@ -1,9 +1,7 @@
 package com.rifledluffy.chairs;
 
-import com.rifledluffy.chairs.chairs.CarpetBlock;
+import com.rifledluffy.chairs.chairs.BlockFilter;
 import com.rifledluffy.chairs.chairs.Chair;
-import com.rifledluffy.chairs.chairs.SlabBlock;
-import com.rifledluffy.chairs.chairs.StairBlock;
 import com.rifledluffy.chairs.config.ConfigManager;
 import com.rifledluffy.chairs.events.ChairCheckEvent;
 import com.rifledluffy.chairs.events.ChairLeaveEvent;
@@ -13,7 +11,6 @@ import com.rifledluffy.chairs.events.ChairTossEvent;
 import com.rifledluffy.chairs.messages.MessageConstruct;
 import com.rifledluffy.chairs.messages.MessageEvent;
 import com.rifledluffy.chairs.messages.MessageType;
-import com.rifledluffy.chairs.updating.Updater;
 import com.rifledluffy.chairs.utility.Util;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -139,21 +136,21 @@ public class ChairManager implements Listener {
 		requireEmptyHand = config.getBoolean("require-empty-hand", false);
 
 		try {
-			String[] vectorString = config.getString("stair-seating-position", "0.5,0.3,0.5").split(",");
+			String[] vectorString = Objects.requireNonNull(config.getString("stair-seating-position", "0.5,0.3,0.5")).split(",");
 			stairSeatingPosition = new Vector(Double.parseDouble(vectorString[0]), Double.parseDouble(vectorString[1]), Double.parseDouble(vectorString[2]));
 		} catch (NumberFormatException e) {
 			stairSeatingPosition = new Vector(0.5D,0.3D,0.5);
 		}
 
         try {
-            String[] vectorString = config.getString("slab-seating-position", "0.5,0.3,0.5").split(",");
+            String[] vectorString = Objects.requireNonNull(config.getString("slab-seating-position", "0.5,0.3,0.5")).split(",");
             slabSeatingPosition = new Vector(Double.parseDouble(vectorString[0]), Double.parseDouble(vectorString[1]), Double.parseDouble(vectorString[2]));
         } catch (NumberFormatException e) {
             slabSeatingPosition= new Vector(0.5,0.3D,0.5);
         }
 
         try {
-            String[] vectorString = config.getString("carpet-seating-position", "0.5,-0.15,0.5").split(",");
+            String[] vectorString = Objects.requireNonNull(config.getString("carpet-seating-position", "0.5,-0.15,0.5")).split(",");
             carpetSeatingPosition = new Vector(Double.parseDouble(vectorString[0]), Double.parseDouble(vectorString[1]), Double.parseDouble(vectorString[2]));
         } catch (NumberFormatException e) {
             carpetSeatingPosition= new Vector(0.5,-0.15D,0.5);
@@ -203,11 +200,9 @@ public class ChairManager implements Listener {
 		player.removePotionEffect(PotionEffectType.REGENERATION);
 		if (flag) exit = findExitPoint(player.getLocation(), block).getLocation();
 		if (Util.surroundedBlock(block) || Util.nearLiquid(player.getLocation().getBlock())) exit = block.getRelative(BlockFace.UP).getLocation();
-		if (exit != null) {
-			exit.setDirection(player.getEyeLocation().getDirection());
-			exit.add(0.5,0,0.5);
-			player.teleport(exit);
-		}
+		exit.setDirection(player.getEyeLocation().getDirection());
+		exit.add(0.5,0,0.5);
+		player.teleport(exit);
 		if (!flag) {
 			Vector v = player.getEyeLocation().getDirection();
 			v.setY(0);
@@ -292,7 +287,7 @@ public class ChairManager implements Listener {
 			return;
 		}
 		
-		if (maxItemSit > 0 && item != null && item.getAmount() > maxItemSit) {
+		if (maxItemSit > 0 && item.getAmount() > maxItemSit) {
 			Util.callEvent(new MessageEvent(MessageType.TOOMANYITEMS, player));
 			return;
 		}
@@ -333,7 +328,6 @@ public class ChairManager implements Listener {
 	@EventHandler
 	public void onRightClick(PlayerInteractEvent event) {
 		if (disabledWorlds.size() > 0 && disabledWorlds.contains(event.getPlayer().getWorld())) return;
-		if (event.isCancelled()) return;
 		if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
 		if (event.getPlayer().isSneaking()) return;
 		if (event.getHand() != EquipmentSlot.HAND) return;
@@ -342,7 +336,7 @@ public class ChairManager implements Listener {
 		Block block = event.getClickedBlock();
 		Player player = event.getPlayer();
 		ItemStack item = event.getItem();
-		if (block == null || player == null) return;
+		if (block == null) return;
 		
 		if (requireEmptyHand && item != null) return;
 		
@@ -350,11 +344,11 @@ public class ChairManager implements Listener {
 			if (item.getType().isBlock()) return;
 		}
 		
-		if (!StairBlock.isBlock(block.getType())
-			&& !CarpetBlock.isBlock(block.getType())
-			&& !SlabBlock.isBlock(block.getType())) return;
+		if (!BlockFilter.isStairsBlock(block.getType())
+			&& !BlockFilter.isCarpetBlock(block.getType())
+			&& !BlockFilter.isSlabBlock(block.getType())) return;
 		
-		if (StairBlock.isBlock(block.getType())) {
+		if (BlockFilter.isStairsBlock(block.getType())) {
 			if (!Util.validStair(block)) return;
 			else {
 				if (checkForSigns) {
@@ -372,9 +366,9 @@ public class ChairManager implements Listener {
 			}
 		} else if (block.getRelative(BlockFace.UP).getType() != Material.AIR) return;
 		
-		if (SlabBlock.isBlock(block.getType())) if (!Util.validSlab(block)) return;
+		if (BlockFilter.isSlabBlock(block.getType())) if (!Util.validSlab(block)) return;
 		
-		if (CarpetBlock.isBlock(block.getType())) if (!Util.validCarpet(block)) return;
+		if (BlockFilter.isCarpetBlock(block.getType())) if (!Util.validCarpet(block)) return;
 		
 		if (event.getBlockFace() == BlockFace.DOWN) return;
 		
@@ -389,7 +383,6 @@ public class ChairManager implements Listener {
 	@EventHandler
 	public void onChangeGameMode(PlayerGameModeChangeEvent event) {
 		if (event.isCancelled()) return;
-		if (event.getPlayer() == null) return;
 		GameMode gameMode = event.getNewGameMode();
 		Chair chair = chairMap.get(event.getPlayer().getUniqueId());
 		if (gameMode == GameMode.SPECTATOR && chair != null) clearChair(chair);
@@ -400,7 +393,7 @@ public class ChairManager implements Listener {
 		if (!(event.getEntity() instanceof Player)) return;
 		Player player = (Player) event.getEntity();
 		Chair chair = chairMap.get(player.getUniqueId());
-		if (event.getDismounted() == null) return;
+		event.getDismounted();
 		if (chair == null || event.getDismounted().getType() != EntityType.ARMOR_STAND) return;
 		if (leaving.contains(player.getUniqueId())) return;
 		if (orienting.contains(player.getUniqueId())) {
@@ -423,7 +416,6 @@ public class ChairManager implements Listener {
 	@EventHandler
 	public void onMove(PlayerMoveEvent event) {
 		Player player = event.getPlayer();
-		if (player == null) return;
 		if (leaving.contains(player.getUniqueId())) {
 			ChairLeaveEvent leaveEvent = new ChairLeaveEvent(chairMap.get(player.getUniqueId()), player, exitWhereFacing);
 			Util.callEvent(leaveEvent);
@@ -454,41 +446,16 @@ public class ChairManager implements Listener {
 	
 	@EventHandler
 	public void onBlockBreak(BlockBreakEvent event) {
-		for (Chair chair: chairs) {
-			if (chair == null) continue;
-			if (chair.getLocation() == null) continue;
-			if (Util.samePosition(event.getBlock(), chair.getBlock())) {
-    			event.setCancelled(true);
-    			break;
-    		}
-		}
+		if (event.isCancelled()) return;
+		chairs.stream()
+				.filter(Objects::nonNull)
+				.filter(c -> c.getLocation() != null)
+				.filter(c -> Util.samePosition(event.getBlock(), c.getBlock()))
+				.findAny()
+				.ifPresent(c -> {
+					if (!event.getPlayer().hasPermission("rfchairs.break")) event.setCancelled(true);
+				});
 	}
-	
-	@EventHandler(priority = EventPriority.LOWEST)
-    public void join(PlayerJoinEvent event) {
-        Player player = event.getPlayer();
-        if (disableUpdates) return;
-        if (player.hasPermission("rfchairs.notify")) {
-			BukkitRunnable update = new BukkitRunnable() {
-				@Override
-				public void run() {
-					Object[] updates = Updater.getLastUpdate();
-					if (updates.length == 2) {
-						player.sendMessage("§6[§eRifle's Chairs§6] New update available:");
-						player.sendMessage("§6New version: §e" + updates[0]);
-						player.sendMessage("§6Your version: §e" + plugin.getDescription().getVersion());
-						player.sendMessage("§6What's new: §e" + updates[1]);
-					} else {
-						if (!disableCurrentUpdate) {
-							player.sendMessage("§8[§6Rifle's Chairs§8]: §6Your version: §e" + plugin.getDescription().getVersion());
-							player.sendMessage("§8[§6Rifle's Chairs§8]: §aYou are up to date!");
-						}
-					}
-				}
-			};
-			update.runTaskAsynchronously(RFChairs.getInstance());
-        }
-    }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void quit(PlayerQuitEvent event) {
@@ -605,7 +572,7 @@ public class ChairManager implements Listener {
 	
 	void loadToggled() {
 		List<String> toggled = configManager.getData().getStringList("Toggled");
-		if (toggled == null || toggled.size() == 0) return;
+		if (toggled.size() == 0) return;
 		plugin.getServer().getLogger().info("[RFChairs] " + toggled.size() + " Players had toggled off. Adding Them...");
 
 		toggled.stream()

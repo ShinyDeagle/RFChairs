@@ -1,7 +1,7 @@
 main: com.rifledluffy.chairs.RFChairs
 name: RFChairs
 version: 6.0
-authors: [Rifle D. Luffy, VicenteRD, carlpoole]
+authors: [Rifle D. Luffy, VicenteRD, carlpoole, i0xHeX]
 api-version: 1.13
 description: Chairs but Rifle's way.
 softdepend: [WorldGuard, WorldEdit]
@@ -13,6 +13,9 @@ commands:
 permissions:
   rfchairs.use:
     description: Use of chairs
+    default: true
+  rfchairs.break:
+    description: allows users to break chairs
     default: true
   rfchairs.mute:
     description: allows the messages when events are triggered
@@ -26,9 +29,6 @@ permissions:
   rfchairs.manage:
     description: allows players to manage the plugin
     default: op
-  rfchairs.update:
-    description: notifiers player of update
-    default: op
   rfchairs.reload:
     description: reload the chairs plugin
     default: op
@@ -41,6 +41,5 @@ permissions:
     children:
       rfchairs.reload: true
       rfchairs.reset: true
-      rfchairs.update: true
       rfchairs.manage: true
       rfchairs.use: true

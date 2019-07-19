@@ -16,7 +16,6 @@ import com.rifledluffy.chairs.command.commands.ReloadCommand;
 import com.rifledluffy.chairs.command.commands.ResetCommand;
 import com.rifledluffy.chairs.command.commands.SubCommand;
 import com.rifledluffy.chairs.command.commands.ToggleCommand;
-import com.rifledluffy.chairs.command.commands.UpdateCommand;
 
 import net.md_5.bungee.api.ChatColor;
 
@@ -35,7 +34,6 @@ public class CommandManager implements CommandExecutor {
     public String reset = "reset";
 	public String toggle = "toggle";
 	public String mute = "mute";
-	public String update = "update";
 
     public void setup() {
         plugin.getCommand(main).setExecutor(this);
@@ -46,7 +44,6 @@ public class CommandManager implements CommandExecutor {
         this.commands.add(new ResetCommand());
         this.commands.add(new ToggleCommand());
         this.commands.add(new MuteCommand());
-        this.commands.add(new UpdateCommand());
     }
 
     public boolean onCommand(CommandSender sender, Command command, String s, String[] args) {
