@@ -119,10 +119,14 @@ public class Util {
 				&& !validExit(block.getRelative(BlockFace.SOUTH))
 				&& !validExit(block.getRelative(BlockFace.WEST));
 	}
-	
+
+	private static boolean isAir(Material type) {
+		return type == Material.AIR || type == Material.CAVE_AIR || type == Material.VOID_AIR;
+	}
+
 	private static boolean validExit(Block block) {
 		Material type = block.getType();
-		return type == Material.AIR || type.name().equals("WALL_SIGN") || type.name().endsWith("_WALL_SIGN");
+		return isAir(type) || type.name().equals("WALL_SIGN") || type.name().endsWith("_WALL_SIGN");
 	}
 	
 	public static boolean isLiqiudOrMagma(Block block) {
@@ -144,7 +148,7 @@ public class Util {
 		BlockFace side = faces.get(0);
 		BlockFace otherSide = faces.get(1);
 
-		if (block.getRelative(BlockFace.UP).getType() != Material.AIR) return false;
+		if (!isAir(block.getRelative(BlockFace.UP).getType())) return false;
 		
 		if (validatedChair(block.getRelative(side))) if (validSeat(block.getRelative(side), side, block)) validSides++;
 		if (validatedChair(block.getRelative(otherSide))) if (validSeat(block.getRelative(otherSide), otherSide, block)) validSides++;
@@ -288,11 +292,11 @@ public class Util {
 	}
 	
 	public static boolean canFitPlayer(Block block) {
-		return block.getType() == Material.AIR && block.getRelative(BlockFace.UP).getType() == Material.AIR;
+		return isAir(block.getType()) && isAir(block.getRelative(BlockFace.UP).getType());
 	}
 	
 	public static boolean safePlace(Block block) {
-		return block.getRelative(BlockFace.DOWN).getType() != Material.AIR;
+		return isAir(block.getRelative(BlockFace.DOWN).getType());
 	}
 	
 	public static Vector getVectorDir(Location caster, Location target) {
