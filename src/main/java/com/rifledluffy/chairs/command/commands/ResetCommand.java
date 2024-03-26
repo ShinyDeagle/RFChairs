@@ -3,53 +3,47 @@ package com.rifledluffy.chairs.command.commands;
 import com.rifledluffy.chairs.RFChairs;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.permissions.Permissible;
+import org.jetbrains.annotations.NotNull;
 
-public class ResetCommand extends SubCommand {
-
+public class ResetCommand implements SubCommand {
     private final RFChairs plugin = RFChairs.getInstance();
 
-    @Override
-    public void onCommand(CommandSender sender, String[] args) {
-        if (sender instanceof Player) {
-            onCommand((Player) sender, args);
-        } else if (sender instanceof ConsoleCommandSender) {
-            onCommand((ConsoleCommandSender) sender, args);
-        } else {
-        }
-    }
-
-    @Override
-    public void onCommand(ConsoleCommandSender sender, String[] args) {
-        plugin.chairManager.clearFakeSeats();
-        plugin.chairManager.clearFakeSeatsFromFile(plugin);
+    public void onCommand(@NotNull CommandSender sender, @NotNull String[] args) {
+        plugin.getChairManager().clearFakeSeats();
+        plugin.getChairManager().clearFakeSeatsFromFile(plugin);
         plugin.getLogger().info("Chairs Reset!");
         sender.sendMessage(ChatColor.DARK_GRAY + "[" + ChatColor.GOLD + "Rifle's Chairs" + ChatColor.DARK_GRAY + "] " + ChatColor.GREEN + "Chairs Reset");
     }
 
     @Override
-    public void onCommand(Player player, String[] args) {
-        if (!player.hasPermission("rfchairs.reset") && !player.hasPermission("rfchairs.manage")) return;
-        plugin.chairManager.clearFakeSeats();
-        plugin.chairManager.clearFakeSeatsFromFile(plugin);
-        plugin.getLogger().info("Chairs Reset!");
-        player.sendMessage(ChatColor.DARK_GRAY + "[" + ChatColor.GOLD + "Rifle's Chairs" + ChatColor.DARK_GRAY + "] " + ChatColor.GREEN + "Chairs Reset");
+    public void onPlayerCommand(@NotNull Player player, @NotNull String[] args) {
+        onCommand(player, args);
     }
 
     @Override
-    public String name() {
-        return plugin.commandManager.reset;
+    public @NotNull String name() {
+        return "reset";
     }
 
     @Override
-    public String info() {
+    public @NotNull String info() {
         return "Resets all chairs";
     }
 
     @Override
-    public String[] aliases() {
+    public @NotNull String @NotNull [] aliases() {
         return new String[0];
     }
 
+    @Override
+    public boolean needsPlayer() {
+        return false;
+    }
+
+    @Override
+    public boolean checkPermission(@NotNull Permissible permissible) {
+        return permissible.hasPermission("rfchairs.reset") || permissible.hasPermission("rfchairs.manage");
+    }
 }

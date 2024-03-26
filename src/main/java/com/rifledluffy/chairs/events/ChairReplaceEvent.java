@@ -4,38 +4,38 @@ import com.rifledluffy.chairs.chairs.Chair;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+import org.jetbrains.annotations.NotNull;
 
 public class ChairReplaceEvent extends Event {
+    private static final @NotNull HandlerList handlers = new HandlerList();
+    private final @NotNull Chair chair;
+    private final @NotNull Player replaced;
+    private final @NotNull Player player;
 
-    private static final HandlerList handlers = new HandlerList();
-    Chair chair;
-    Player replaced;
-    Player player;
-
-    public ChairReplaceEvent(Chair chair, Player replaced, Player player) {
+    public ChairReplaceEvent(@NotNull Chair chair, @NotNull Player replaced, @NotNull Player player) {
         this.chair = chair;
         this.replaced = replaced;
         this.player = player;
     }
 
-    static public HandlerList getHandlerList() {
+    static public @NotNull HandlerList getHandlerList() {
         return handlers;
     }
 
-    public Chair getChair() {
+    public @NotNull Chair getChair() {
         return this.chair;
     }
 
-    public Player getReplaced() {
+    public @NotNull Player getReplaced() {
         return this.replaced;
     }
 
-    public Player getPlayer() {
+    public @NotNull Player getPlayer() {
         return this.player;
     }
 
     @Override
-    public HandlerList getHandlers() {
+    public @NotNull HandlerList getHandlers() {
         return handlers;
     }
 }

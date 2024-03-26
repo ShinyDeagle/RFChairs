@@ -1,7 +1,8 @@
 package com.rifledluffy.chairs.messages;
 
-public class Messages {
+import org.jetbrains.annotations.NotNull;
 
+public class Messages {
     private final static String occupied = "occupied-seat";
     private final static String tooFar = "too-far-from-seat";
     private final static String noPerms = "no-permission";
@@ -13,7 +14,6 @@ public class Messages {
     private final static String priority = "priority-replaced";
     private final static String noSigns = "no-sign-at-ends";
     private final static String worldGuard = "denied-by-worldguard";
-    private final static String plotSquared = "denied-by-plotsquared";
 
     private final static String defaultOccupied = "&8[&6Rifle's Chairs&8] &cCan't sit there &7%user%&a, my homie &7%seated%&c sits there.";
     private final static String defaultTooFar = "&8[&6Rifle's Chairs&8] &cCan't sit there &7%user%&c. You are too far!";
@@ -26,67 +26,36 @@ public class Messages {
     private final static String defaultPriority = "&8[&6Rifle's Chairs&8] &cYou forcibly tossed to make space for &7%user%&c, &7%seated%";
     private final static String defaultNoSigns = "&8[&6Rifle's Chairs&8] &cThis seat &8[&7which is a stair&8]&c doesn't have signs on both its ends!";
     private final static String defaultWorldGuard = "&8[&6Rifle's Chairs&8] &cYou may not sit in this region!";
-    private final static String defaultPlotSquared = "&8[&6Rifle's Chairs&8] &cYou may not sit in this plot!";
 
-    public static String getDefault(MessageType type) {
-        switch (type) {
-            default:
-                return null;
-            case OCCUPIED:
-                return Messages.defaultOccupied;
-            case TOOFAR:
-                return Messages.defaultTooFar;
-            case NOPERMS:
-                return Messages.defaultNoPerms;
-            case TOOMANYITEMS:
-                return Messages.defaultTooMany;
-            case TOSSED:
-                return Messages.defaultTossed;
-            case TOSSEDSPEED:
-                return Messages.defaultTossedSpeed;
-            case TOSSING:
-                return Messages.defaultTossing;
-            case TOSSINGSPEED:
-                return Messages.defaultTossingSpeed;
-            case PRIORITYTOSS:
-                return Messages.defaultPriority;
-            case NOSIGNS:
-                return Messages.defaultNoSigns;
-            case WORLDGUARD:
-                return Messages.defaultWorldGuard;
-            case PLOTSQUARED:
-                return Messages.defaultPlotSquared;
-        }
+    public static @NotNull String getDefault(@NotNull MessageType type) {
+        return switch (type) {
+            case OCCUPIED -> Messages.defaultOccupied;
+            case TOOFAR -> Messages.defaultTooFar;
+            case NOPERMS -> Messages.defaultNoPerms;
+            case TOOMANYITEMS -> Messages.defaultTooMany;
+            case TOSSED -> Messages.defaultTossed;
+            case TOSSEDSPEED -> Messages.defaultTossedSpeed;
+            case TOSSING -> Messages.defaultTossing;
+            case TOSSINGSPEED -> Messages.defaultTossingSpeed;
+            case PRIORITYTOSS -> Messages.defaultPriority;
+            case NOSIGNS -> Messages.defaultNoSigns;
+            case WORLDGUARD -> Messages.defaultWorldGuard;
+        };
     }
 
-    public static String getMessage(MessageType type) {
-        switch (type) {
-            default:
-                return null;
-            case OCCUPIED:
-                return Messages.occupied;
-            case TOOFAR:
-                return Messages.tooFar;
-            case NOPERMS:
-                return Messages.noPerms;
-            case TOOMANYITEMS:
-                return Messages.tooMany;
-            case TOSSED:
-                return Messages.tossed;
-            case TOSSEDSPEED:
-                return Messages.tossedSpeed;
-            case TOSSING:
-                return Messages.tossing;
-            case TOSSINGSPEED:
-                return Messages.tossingSpeed;
-            case PRIORITYTOSS:
-                return Messages.priority;
-            case NOSIGNS:
-                return Messages.noSigns;
-            case WORLDGUARD:
-                return Messages.worldGuard;
-            case PLOTSQUARED:
-                return Messages.plotSquared;
-        }
+    public static @NotNull String getMessage(@NotNull MessageType type) {
+        return switch (type) {
+            case OCCUPIED -> Messages.occupied;
+            case TOOFAR -> Messages.tooFar;
+            case NOPERMS -> Messages.noPerms;
+            case TOOMANYITEMS -> Messages.tooMany;
+            case TOSSED -> Messages.tossed;
+            case TOSSEDSPEED -> Messages.tossedSpeed;
+            case TOSSING -> Messages.tossing;
+            case TOSSINGSPEED -> Messages.tossingSpeed;
+            case PRIORITYTOSS -> Messages.priority;
+            case NOSIGNS -> Messages.noSigns;
+            case WORLDGUARD -> Messages.worldGuard;
+        };
     }
 }

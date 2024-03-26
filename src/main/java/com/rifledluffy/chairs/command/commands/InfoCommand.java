@@ -1,46 +1,43 @@
 package com.rifledluffy.chairs.command.commands;
 
-import com.rifledluffy.chairs.RFChairs;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.permissions.Permissible;
+import org.jetbrains.annotations.NotNull;
 
-public class InfoCommand extends SubCommand {
-
-    private final RFChairs plugin = RFChairs.getInstance();
+public class InfoCommand implements SubCommand { //todo
 
     @Override
-    public void onCommand(CommandSender sender, String[] args) {
-        if (sender instanceof Player) {
-            onCommand((Player) sender, args);
-        } else if (sender instanceof ConsoleCommandSender) {
-            onCommand((ConsoleCommandSender) sender, args);
-        } else {
-        }
+    public void onCommand(@NotNull CommandSender sender, @NotNull String[] args) {
+
     }
 
     @Override
-    public void onCommand(ConsoleCommandSender sender, String[] args) {
-        sender.sendMessage("�cOnly players can use commands for this plugin.");
+    public void onPlayerCommand(@NotNull Player player, @NotNull String[] args) {
     }
 
     @Override
-    public void onCommand(Player player, String[] args) {
+    public @NotNull String name() {
+        return "info";
     }
 
     @Override
-    public String name() {
-        return plugin.commandManager.info;
-    }
-
-    @Override
-    public String info() {
+    public @NotNull String info() {
         return "";
     }
 
     @Override
-    public String[] aliases() {
+    public String @NotNull [] aliases() {
         return new String[0];
     }
 
+    @Override
+    public boolean needsPlayer() {
+        return true;
+    }
+
+    @Override
+    public boolean checkPermission(@NotNull Permissible permissible) {
+        return permissible.hasPermission("rfchairs.info");
+    }
 }

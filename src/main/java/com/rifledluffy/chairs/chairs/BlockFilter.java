@@ -2,37 +2,15 @@ package com.rifledluffy.chairs.chairs;
 
 import com.rifledluffy.chairs.RFChairs;
 import org.bukkit.Material;
+import org.bukkit.Tag;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
-import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
 
 public class BlockFilter {
-
-    private static final Set<Material> carpetTypeSet;
-    private static final Set<Material> slabTypeSet;
-    private static final Set<Material> stairsTypeSet;
-    private static Set<String> whitelist, blacklist;
-
-    static {
-        carpetTypeSet = EnumSet.noneOf(Material.class);
-        slabTypeSet = EnumSet.noneOf(Material.class);
-        stairsTypeSet = EnumSet.noneOf(Material.class);
-
-        Arrays.stream(Material.values())
-                .filter(m -> !m.name().startsWith("LEGACY_"))
-                .forEach(m -> {
-                    String name = m.name();
-                    if (name.endsWith("_CARPET"))
-                        carpetTypeSet.add(m);
-                    else if (name.endsWith("_SLAB"))
-                        slabTypeSet.add(m);
-                    else if (name.endsWith("_STAIRS"))
-                        stairsTypeSet.add(m);
-                });
-    }
+    private static Set<@NotNull String> whitelist, blacklist;
 
     public static void reload() {
         FileConfiguration config = RFChairs.getInstance().getConfig();
@@ -40,41 +18,41 @@ public class BlockFilter {
         blacklist = new HashSet<>(config.getStringList("blacklisted-chairs"));
     }
 
-    public static boolean isWhitelisted(Material type, String category) {
+    public static boolean isWhitelisted(@NotNull Material type, @NotNull String category) {
         if (whitelist.contains("ALL_" + category)) return true;
         return whitelist.contains(type.name());
     }
 
-    public static boolean isBlacklisted(Material type, String category) {
+    public static boolean isBlacklisted(@NotNull Material type, @NotNull String category) {
         if (blacklist.contains("ALL_" + category)) return true;
         return blacklist.contains(type.name());
     }
 
     // validate
 
-    public static boolean validateCarpet(Material type) {
+    public static boolean validateCarpet(@NotNull Material type) {
         return isWhitelisted(type, "CARPETS") && !isBlacklisted(type, "CARPET");
     }
 
-    public static boolean validateSlab(Material type) {
+    public static boolean validateSlab(@NotNull Material type) {
         return isWhitelisted(type, "SLABS") && !isBlacklisted(type, "SLAB");
     }
 
-    public static boolean validateStairs(Material type) {
+    public static boolean validateStairs(@NotNull Material type) {
         return isWhitelisted(type, "STAIRS") && !isBlacklisted(type, "STAIRS");
     }
 
     // check
 
-    public static boolean isCarpetBlock(Material type) {
-        return carpetTypeSet.contains(type);
+    public static boolean isCarpetBlock(@NotNull Material type) {
+        return Tag.WOOL_CARPETS.isTagged(type);
     }
 
-    public static boolean isSlabBlock(Material type) {
-        return slabTypeSet.contains(type);
+    public static boolean isSlabBlock(@NotNull Material type) {
+        return Tag.SLABS.isTagged(type);
     }
 
-    public static boolean isStairsBlock(Material type) {
-        return stairsTypeSet.contains(type);
+    public static boolean isStairsBlock(@NotNull Material type) {
+        return Tag.STAIRS.isTagged(type);
     }
 }

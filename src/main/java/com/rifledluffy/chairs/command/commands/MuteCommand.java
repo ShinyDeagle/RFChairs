@@ -4,37 +4,23 @@ import com.rifledluffy.chairs.MessageManager;
 import com.rifledluffy.chairs.RFChairs;
 import com.rifledluffy.chairs.utility.Util;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.permissions.Permissible;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.UUID;
 
-public class MuteCommand extends SubCommand {
+public class MuteCommand implements SubCommand {
 
-    private final RFChairs plugin = RFChairs.getInstance();
-
-    @Override
-    public void onCommand(CommandSender sender, String[] args) {
-        if (sender instanceof Player) {
-            onCommand((Player) sender, args);
-        } else if (sender instanceof ConsoleCommandSender) {
-            onCommand((ConsoleCommandSender) sender, args);
-        } else {
-        }
+    public void onCommand(@NotNull CommandSender sender, @NotNull String[] args) {
     }
 
     @Override
-    public void onCommand(ConsoleCommandSender sender, String[] args) {
-        sender.sendMessage("�cOnly players can use commands for this plugin.");
-    }
-
-    @Override
-    public void onCommand(Player player, String[] args) {
-        MessageManager messageManager = plugin.messageManager;
+    public void onPlayerCommand(@NotNull Player player, @NotNull String[] args) {
+        MessageManager messageManager = RFChairs.getInstance().getMessageManager();
         List<UUID> muted = messageManager.muted;
         String message;
-        if (!player.hasPermission("rfchairs.mute")) return;
         if (muted.contains(player.getUniqueId())) {
             String string = messageManager.messages.getString("mute-message-enabled", "&8[&6Rifle's Chairs&8] &7Event Messaging is now &cDisabled!");
             message = Util.replaceMessage(player, string);
@@ -49,18 +35,27 @@ public class MuteCommand extends SubCommand {
     }
 
     @Override
-    public String name() {
-        return plugin.commandManager.mute;
+    public @NotNull String name() {
+        return "mute";
     }
 
     @Override
-    public String info() {
+    public @NotNull String info() {
         return "";
     }
 
     @Override
-    public String[] aliases() {
+    public String @NotNull [] aliases() {
         return new String[0];
     }
 
+    @Override
+    public boolean needsPlayer() {
+        return true;
+    }
+
+    @Override
+    public boolean checkPermission(@NotNull Permissible permissible) {
+        return permissible.hasPermission("rfchairs.mute");
+    }
 }

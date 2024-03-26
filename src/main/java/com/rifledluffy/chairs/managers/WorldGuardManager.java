@@ -16,16 +16,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class WorldGuardManager {
-
-    @SuppressWarnings("rawtypes")
-    public static Flag flag;
+    public static StateFlag flag;
     private final RFChairs plugin = RFChairs.getInstance();
     public WorldGuard worldGuard;
-    public WorldGuardPlugin worldGuardPlugin;
-    public RegionContainer container;
 
     public WorldGuardManager() {
     }
@@ -65,9 +60,9 @@ public class WorldGuardManager {
 
         List<ApplicableRegionSet> regionSetList = getContainer().getLoaded().stream()
                 .map(manager -> manager.getApplicableRegions(vector3))
-                .collect(Collectors.toList());
+                .toList();
 
-        if (regionSetList.size() == 0) return true;
+        if (regionSetList.isEmpty()) return true;
 
         return regionSetList.stream()
                 .allMatch(set -> set.testState(localPlayer, (StateFlag) worldManager.getFlag()));

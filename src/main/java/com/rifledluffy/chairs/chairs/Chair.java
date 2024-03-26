@@ -12,18 +12,19 @@ import org.bukkit.entity.Player;
 import org.bukkit.material.Stairs;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class Chair {
-
     private final BukkitRunnable clear;
     private final int clearID;
 
-    private Location location;
-    private Block chair;
+    private @Nullable Location location;
+    private @Nullable Block chair;
     private ArmorStand fakeSeat = null;
-    private Player player;
+    private @Nullable Player player;
 
-    public Chair(Player player, Location location) {
+    public Chair(@NotNull Player player, @NotNull Location location) {
         this.location = location;
         this.player = player;
         this.chair = location.getBlock();
@@ -36,7 +37,9 @@ public class Chair {
                     clear();
                     return;
                 }
-                if (fakeSeat.getPassengers().size() == 0) clear();
+                if (fakeSeat.getPassengers().isEmpty()) {
+                    clear();
+                }
             }
 
         };
@@ -47,35 +50,35 @@ public class Chair {
      * Getters
      */
 
-    public ArmorStand getFakeSeat() {
+    public @Nullable ArmorStand getFakeSeat() {
         return fakeSeat;
     }
 
-    public void setFakeSeat(ArmorStand armorStand) {
+    public void setFakeSeat(@NotNull ArmorStand armorStand) {
         fakeSeat = armorStand;
     }
 
-    public Player getPlayer() {
+    public @Nullable Player getPlayer() {
         return player;
     }
 
-    public void setPlayer(Player player) {
+    public void setPlayer(@NotNull Player player) {
         this.player = player;
     }
 
-    public Block getBlock() {
+    public @Nullable Block getBlock() {
         return location.getBlock();
     }
 
-    public BlockState getBlockState() {
+    public @Nullable BlockState getBlockState() {
         return chair.getState();
     }
 
-    public BlockData getBlockData() {
+    public @Nullable BlockData getBlockData() {
         return chair.getState().getBlockData();
     }
 
-    public BlockFace getFacing() {
+    public @Nullable BlockFace getFacing() {
         if (!BlockFilter.isStairsBlock(chair.getType())) return null;
         return ((Stairs) chair.getState().getData()).getFacing();
     }
@@ -84,7 +87,7 @@ public class Chair {
      * Setters
      */
 
-    public Location getLocation() {
+    public @Nullable Location getLocation() {
         return location;
     }
 
@@ -98,12 +101,13 @@ public class Chair {
 
     public void clear() {
         if (fakeSeat != null) fakeSeat.remove();
-        if (player != null) player.removePotionEffect(PotionEffectType.REGENERATION);
+        player.removePotionEffect(PotionEffectType.REGENERATION);
         chair = null;
         location = null;
         fakeSeat = null;
         player = null;
-        if (Bukkit.getScheduler().isCurrentlyRunning(clearID)) clear.cancel();
+        if (Bukkit.getScheduler().isCurrentlyRunning(clearID)) {
+            clear.cancel();
+        }
     }
-
 }

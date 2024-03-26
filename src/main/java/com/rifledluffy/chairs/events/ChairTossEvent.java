@@ -6,17 +6,18 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class ChairTossEvent extends Event {
+    private static final @NotNull HandlerList handlers = new HandlerList();
+    private final @NotNull Chair chair;
+    private final @NotNull Player player;
+    private final @NotNull Entity attacker;
+    private final @Nullable TargetInfo info;
+    private final boolean silent;
 
-    private static final HandlerList handlers = new HandlerList();
-    Chair chair;
-    Player player;
-    Entity attacker;
-    TargetInfo info;
-    boolean silent;
-
-    public ChairTossEvent(Chair chair, Player player, Entity attacker, TargetInfo info, boolean flag) {
+    public ChairTossEvent(@NotNull Chair chair, @NotNull Player player, @NotNull Entity attacker, @Nullable TargetInfo info, boolean flag) {
         this.chair = chair;
         this.player = player;
         this.attacker = attacker;
@@ -24,23 +25,23 @@ public class ChairTossEvent extends Event {
         this.silent = flag;
     }
 
-    static public HandlerList getHandlerList() {
+    static public @NotNull HandlerList getHandlerList() {
         return handlers;
     }
 
-    public Chair getChair() {
+    public @NotNull Chair getChair() {
         return this.chair;
     }
 
-    public Player getPlayer() {
+    public @NotNull Player getPlayer() {
         return this.player;
     }
 
-    public Entity getAttacker() {
+    public @NotNull Entity getAttacker() {
         return this.attacker;
     }
 
-    public TargetInfo getInfo() {
+    public @Nullable TargetInfo getInfo() {
         return this.info;
     }
 
@@ -49,7 +50,7 @@ public class ChairTossEvent extends Event {
     }
 
     @Override
-    public HandlerList getHandlers() {
+    public @NotNull HandlerList getHandlers() {
         return handlers;
     }
 }

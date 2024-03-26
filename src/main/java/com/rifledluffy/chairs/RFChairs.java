@@ -13,13 +13,12 @@ import org.bukkit.potion.PotionEffectType;
 import java.io.IOException;
 
 public class RFChairs extends JavaPlugin {
-
     private static RFChairs instance;
-    public CommandManager commandManager;
-    public ConfigManager cfgManager;
-    public ChairManager chairManager;
-    public MessageManager messageManager;
-    public WorldGuardManager worldGuardManager;
+    private CommandManager commandManager;
+    private ConfigManager cfgManager;
+    private ChairManager chairManager;
+    private MessageManager messageManager;
+    private WorldGuardManager worldGuardManager;
 
     public static RFChairs getInstance() {
         return instance;
@@ -53,9 +52,8 @@ public class RFChairs extends JavaPlugin {
 
     @Override
     public void onEnable() {
-
         @SuppressWarnings("unused")
-        MetricsLite metrics = new MetricsLite(this);
+        MetricsLite metrics = new MetricsLite();
 
         commandManager = new CommandManager();
         commandManager.setup();
@@ -102,7 +100,7 @@ public class RFChairs extends JavaPlugin {
         try {
             cfgManager.setup();
         } catch (IOException e) {
-            e.printStackTrace();
+            getInstance().getComponentLogger().info("Could not setup ConfigManager", e);
         }
         cfgManager.reloadConfig();
     }
@@ -113,6 +111,18 @@ public class RFChairs extends JavaPlugin {
 
     public void setConfigManager(ConfigManager configManager) {
         this.cfgManager = configManager;
+    }
+
+    public MessageManager getMessageManager() {
+        return messageManager;
+    }
+
+    public ChairManager getChairManager() {
+        return chairManager;
+    }
+
+    public CommandManager getCommandManager() {
+        return commandManager;
     }
 
     public WorldGuardManager getWorldGuardManager() {
@@ -126,5 +136,4 @@ public class RFChairs extends JavaPlugin {
     boolean hasWorldGuard() {
         return worldGuardManager != null;
     }
-
 }

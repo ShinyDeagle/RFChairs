@@ -55,8 +55,8 @@ public class ChairManager implements Listener {
     private PotionEffect regenEffect = new PotionEffect(PotionEffectType.REGENERATION, 655200, config.getInt("regen-potency", 0), false, false);
     private boolean regenWhenSitting;
     //Update related
-    private boolean disableCurrentUpdate;
-    private boolean disableUpdates;
+    private boolean disableCurrentUpdate; //todo
+    private boolean disableUpdates; //todo
     //Kick them off their seat if they take damage
     private boolean canLaunch;
     //Toss them off their seat if they take damage
@@ -139,7 +139,7 @@ public class ChairManager implements Listener {
         if (event.getPlayer() == null) return;
 
         if (plugin.hasWorldGuard()) if (!plugin.getWorldGuardManager().validateSeating(chair, event.getPlayer())) {
-            Util.callEvent(new MessageEvent(MessageType.WORLDGUARD, event.getPlayer()));
+            new MessageEvent(MessageType.WORLDGUARD, event.getPlayer()).callEvent();
             return;
         }
 
@@ -195,27 +195,33 @@ public class ChairManager implements Listener {
         boolean silent = event.isSilent();
 
         ChairLeaveEvent leaveEvent = new ChairLeaveEvent(chair, player, false);
-        Util.callEvent(leaveEvent);
+        leaveEvent.callEvent();
 
         if (!silent) {
             MessageEvent messageEvent;
             MessageEvent otherEvent = null;
             if (attacker instanceof Player playerEntity) {
-                if (info != null && !info.isSprinting())
+                if (info != null && !info.isSprinting()) {
                     messageEvent = new MessageEvent(MessageType.TOSSED, MessageConstruct.DEFENSIVE, player, playerEntity);
-                else
+                } else {
                     messageEvent = new MessageEvent(MessageType.TOSSEDSPEED, MessageConstruct.DEFENSIVE, player, playerEntity);
+                }
 
-                if (info != null && !info.isSprinting())
+                if (info != null && !info.isSprinting()) {
                     otherEvent = new MessageEvent(MessageType.TOSSING, MessageConstruct.OFFENSIVE, playerEntity, player);
-                else
+                } else {
                     otherEvent = new MessageEvent(MessageType.TOSSINGSPEED, MessageConstruct.OFFENSIVE, playerEntity, player);
+                }
             } else messageEvent = new MessageEvent(MessageType.TOSSED, player, attacker);
-            Util.callEvent(messageEvent);
-            if (otherEvent != null) Util.callEvent(otherEvent);
+            messageEvent.callEvent();
+            if (otherEvent != null) {
+                otherEvent.callEvent();
+            }
         }
 
-        if (canToss) ejectPlayer(block, player, attacker);
+        if (canToss) {
+            ejectPlayer(block, player, attacker);
+        }
     }
 
     @EventHandler
@@ -231,16 +237,16 @@ public class ChairManager implements Listener {
         if (player.getUniqueId() == seated.getUniqueId()) return;
 
         ChairTossEvent tossEvent = new ChairTossEvent(chair, seated, player, null, true);
-        Util.callEvent(tossEvent);
+        tossEvent.callEvent();
 
         MessageEvent tossed = new MessageEvent(MessageType.TOSSED, MessageConstruct.DEFENSIVE, seated, player);
-        Util.callEvent(tossed);
+        tossed.callEvent();
 
         ChairSitEvent sitEvent = new ChairSitEvent(new Chair(player, block.getLocation()), player);
-        Util.callEvent(sitEvent);
+        sitEvent.callEvent();
 
         MessageEvent tosser = new MessageEvent(MessageType.TOSSING, MessageConstruct.OFFENSIVE, player, seated);
-        Util.callEvent(tosser);
+        tosser.callEvent();
     }
 
     @EventHandler
@@ -250,35 +256,37 @@ public class ChairManager implements Listener {
         Block block = event.getBlock();
 
         if (!player.hasPermission("rfchairs.use")) {
-            Util.callEvent(new MessageEvent(MessageType.NOPERMS, player));
+            new MessageEvent(MessageType.NOPERMS, player).callEvent();
             return;
         }
 
         if (player.getLocation().distance(block.getLocation().add(0.5, 0, 0.5)) >= maxDistance) {
-            Util.callEvent(new MessageEvent(MessageType.TOOFAR, player));
+            new MessageEvent(MessageType.TOOFAR, player).callEvent();
             return;
         }
 
         if (maxItemSit > 0 && item.getAmount() > maxItemSit) {
-            Util.callEvent(new MessageEvent(MessageType.TOOMANYITEMS, player));
+            new MessageEvent(MessageType.TOOMANYITEMS, player).callEvent();
             return;
         }
 
         if (!Util.blockIsChair(block, chairs)) {
             ChairSitEvent sitEvent = new ChairSitEvent(new Chair(player, block.getLocation()), player);
-            Util.callEvent(sitEvent);
+            sitEvent.callEvent();
         } else {
             Chair chair = Util.getChairFromBlock(block, chairs);
             if (chair == null) return;
-            if (chair.getFakeSeat() != null && chair.getFakeSeat().getPassengers().size() == 0) {
+            if (chair.getFakeSeat() != null && chair.getFakeSeat().getPassengers().isEmpty()) {
                 chair.setPlayer(player);
                 chair.getFakeSeat().addPassenger(player);
-                if (regenWhenSitting) player.addPotionEffect(regenEffect);
+                if (regenWhenSitting) {
+                    player.addPotionEffect(regenEffect);
+                }
                 return;
             }
             if (player.hasPermission("rfchairs.priority") && priorityIfHasPerm) {
                 ChairReplaceEvent replaceEvent = new ChairReplaceEvent(chair, chair.getPlayer(), player);
-                Util.callEvent(replaceEvent);
+                replaceEvent.callEvent();
                 return;
             }
             if (chair.getPlayer() == null) return;
@@ -292,14 +300,14 @@ public class ChairManager implements Listener {
                 chair.getFakeSeat().addPassenger(player);
             } else {
                 MessageEvent occupied = new MessageEvent(MessageType.OCCUPIED, MessageConstruct.OFFENSIVE, player, chair.getPlayer());
-                Util.callEvent(occupied);
+                occupied.callEvent();
             }
         }
     }
 
     @EventHandler
     public void onRightClick(PlayerInteractEvent event) {
-        if (disabledWorlds.size() > 0 && disabledWorlds.contains(event.getPlayer().getWorld())) return;
+        if (!disabledWorlds.isEmpty() && disabledWorlds.contains(event.getPlayer().getWorld())) return;
         if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
         if (event.getPlayer().isSneaking()) return;
         if (event.getHand() != EquipmentSlot.HAND) return;
@@ -327,7 +335,7 @@ public class ChairManager implements Listener {
                     if (!Util.validCouch(block)) {
                         if (!trapSeats) return;
                         if (!Util.throneChair(block)) {
-                            Util.callEvent(new MessageEvent(MessageType.NOSIGNS, player));
+                            new MessageEvent(MessageType.NOSIGNS, player).callEvent();
                             return;
                         }
                     } else if (block.getRelative(BlockFace.UP).getType() != Material.AIR) return;
@@ -345,11 +353,11 @@ public class ChairManager implements Listener {
         if (event.getBlockFace() == BlockFace.DOWN) return;
 
         if (!player.hasPermission("rfchairs.use")) {
-            Util.callEvent(new MessageEvent(MessageType.NOPERMS, player));
+            new MessageEvent(MessageType.NOPERMS, player).callEvent();
             return;
         }
 
-        Util.callEvent(new ChairCheckEvent(block, player));
+        new ChairCheckEvent(block, player).callEvent();
     }
 
     @EventHandler
@@ -377,7 +385,7 @@ public class ChairManager implements Listener {
             if (info.hasSource() && info.livingSource()) attacker = info.getLivingSource();
 
             ChairTossEvent tossEvent = new ChairTossEvent(chairMap.get(player.getUniqueId()), player, attacker, info, false);
-            Util.callEvent(tossEvent);
+            tossEvent.callEvent();
             tossed.remove(player.getUniqueId());
             return;
         }
@@ -389,7 +397,7 @@ public class ChairManager implements Listener {
         Player player = event.getPlayer();
         if (leaving.contains(player.getUniqueId())) {
             ChairLeaveEvent leaveEvent = new ChairLeaveEvent(chairMap.get(player.getUniqueId()), player, exitWhereFacing);
-            Util.callEvent(leaveEvent);
+            leaveEvent.callEvent();
             leaving.remove(player.getUniqueId());
         }
     }
@@ -432,7 +440,7 @@ public class ChairManager implements Listener {
         Player player = event.getPlayer();
         Chair chair = chairMap.get(player.getUniqueId());
         ChairLeaveEvent leaveEvent = new ChairLeaveEvent(chair, player, exitWhereFacing);
-        Util.callEvent(leaveEvent);
+        leaveEvent.callEvent();
     }
 
     @EventHandler
@@ -468,7 +476,7 @@ public class ChairManager implements Listener {
         Player player = event.getEntity();
         Chair chair = chairMap.get(player.getUniqueId());
         ChairLeaveEvent leaveEvent = new ChairLeaveEvent(chair, player);
-        Util.callEvent(leaveEvent);
+        leaveEvent.callEvent();
     }
 
     /*
@@ -534,7 +542,7 @@ public class ChairManager implements Listener {
 
     void saveToggled() {
         List<String> ids = new ArrayList<>();
-        if (toggled == null || toggled.size() == 0) configManager.getData().set("Toggled", new ArrayList<String>());
+        if (toggled == null || toggled.isEmpty()) configManager.getData().set("Toggled", new ArrayList<String>());
         for (UUID id : toggled) ids.add(id.toString());
         plugin.getServer().getLogger().info("[RFChairs] Saving " + ids.size() + " Players that had toggled off.");
         configManager.getData().set("Toggled", ids);
@@ -542,7 +550,7 @@ public class ChairManager implements Listener {
 
     void loadToggled() {
         List<String> toggled = configManager.getData().getStringList("Toggled");
-        if (toggled.size() == 0) return;
+        if (toggled.isEmpty()) return;
         plugin.getServer().getLogger().info("[RFChairs] " + toggled.size() + " Players had toggled off. Adding Them...");
 
         toggled.stream()

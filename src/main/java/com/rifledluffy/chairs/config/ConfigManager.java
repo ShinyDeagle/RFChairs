@@ -11,17 +11,16 @@ import java.io.File;
 import java.io.IOException;
 
 public class ConfigManager {
-
     private final JavaPlugin plugin = RFChairs.getPlugin(RFChairs.class);
-    FileConfiguration config;
+    private FileConfiguration config;
     /*
      * Configuration Files
      */
-    File configFile;
-    FileConfiguration fake;
-    File fakeFile;
-    FileConfiguration message;
-    File messageFile;
+    private File configFile;
+    private FileConfiguration fake;
+    private File fakeFile;
+    private FileConfiguration message;
+    private File messageFile;
 
     public void setup() throws IOException {
         configFile = new File(plugin.getDataFolder(), "config.yml");

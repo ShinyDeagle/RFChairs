@@ -5,42 +5,45 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class ChairCheckEvent extends Event {
+    private static final @NotNull HandlerList handlers = new HandlerList();
+    private final @Nullable Chair chair;
+    private final @Nullable Block block;
+    private final @NotNull Player player;
 
-    private static final HandlerList handlers = new HandlerList();
-    Chair chair;
-    Block block;
-    Player player;
-
-    public ChairCheckEvent(Chair chair, Player player) {
+    public ChairCheckEvent(@NotNull Chair chair, @NotNull Player player) {
         this.chair = chair;
+        this.block = null;
         this.player = player;
     }
 
-    public ChairCheckEvent(Block block, Player player) {
+    public ChairCheckEvent(@NotNull Block block, @NotNull Player player) {
+        this.chair = null;
         this.block = block;
         this.player = player;
     }
 
-    static public HandlerList getHandlerList() {
+    static public @NotNull HandlerList getHandlerList() {
         return handlers;
     }
 
-    public Chair getChair() {
+    public @Nullable Chair getChair() {
         return this.chair;
     }
 
-    public Block getBlock() {
+    public @Nullable Block getBlock() {
         return this.block;
     }
 
-    public Player getPlayer() {
+    public @NotNull Player getPlayer() {
         return this.player;
     }
 
     @Override
-    public HandlerList getHandlers() {
+    public @NotNull HandlerList getHandlers() {
         return handlers;
     }
 }

@@ -1,11 +1,14 @@
 package com.rifledluffy.chairs.metrics;
 
+import com.rifledluffy.chairs.RFChairs;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.ServicePriority;
-import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -18,24 +21,20 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.Collection;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.UUID;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.zip.GZIPOutputStream;
 
 /**
  * bStats collects some data for plugin authors.
  * <p>
- * Check out https://bStats.org/ to learn more about bStats!
+ * Check out <a href="https://bStats.org/">bStats.org</a> to learn more about bStats!
  */
 public class MetricsLite {
-
     // The version of this bStats class
     public static final int B_STATS_VERSION = 1;
     // The url to which the data is sent
-    private static final String URL = "https://bStats.org/submitData/bukkit";
+    private static final @NotNull String URL = "https://bStats.org/submitData/bukkit";
     // Should failed requests be logged?
     private static boolean logFailedRequests;
     // The uuid of the server
@@ -44,7 +43,7 @@ public class MetricsLite {
     static {
         // You can use the property to disable the check in your test environment
         if (System.getProperty("bstats.relocatecheck") == null || !System.getProperty("bstats.relocatecheck").equals("false")) {
-            // Maven's Relocate is clever and changes strings, too. So we have to use this little "trick" ... :D
+            // Mavens Relocate is clever and changes strings, too. So we have to use this little "trick" ... :D
             final String defaultPackage = new String(
                     new byte[]{'o', 'r', 'g', '.', 'b', 's', 't', 'a', 't', 's', '.', 'b', 'u', 'k', 'k', 'i', 't'});
             final String examplePackage = new String(new byte[]{'y', 'o', 'u', 'r', '.', 'p', 'a', 'c', 'k', 'a', 'g', 'e'});
@@ -55,22 +54,9 @@ public class MetricsLite {
         }
     }
 
-    // The plugin
-    private final JavaPlugin plugin;
-
-    /**
-     * Class constructor.
-     *
-     * @param plugin The plugin which stats should be submitted.
-     */
-    public MetricsLite(JavaPlugin plugin) {
-        if (plugin == null) {
-            throw new IllegalArgumentException("Plugin cannot be null!");
-        }
-        this.plugin = plugin;
-
+    public MetricsLite() {
         // Get the config file
-        File bStatsFolder = new File(plugin.getDataFolder().getParentFile(), "bStats");
+        File bStatsFolder = new File(RFChairs.getInstance().getDataFolder().getParentFile(), "bStats");
         File configFile = new File(bStatsFolder, "config.yml");
         YamlConfiguration config = YamlConfiguration.loadConfiguration(configFile);
 
@@ -85,11 +71,13 @@ public class MetricsLite {
             config.addDefault("logFailedRequests", false);
 
             // Inform the server owners about bStats
-            config.options().header(
-                    "bStats collects some data for plugin authors like how many servers are using their plugins.\n" +
-                            "To honor their work, you should not disable it.\n" +
-                            "This has nearly no effect on the server performance!\n" +
-                            "Check out https://bStats.org/ to learn more :)"
+            config.options().setHeader(
+                    List.of(
+                            "bStats collects some data for plugin authors like how many servers are using their plugins.",
+                            "To honor their work, you should not disable it.",
+                            "This has nearly no effect on the server performance!",
+                            "Check out https://bStats.org/ to learn more :)")
+
             ).copyDefaults(true);
             try {
                 config.save(configFile);
@@ -112,7 +100,7 @@ public class MetricsLite {
                 }
             }
             // Register our service
-            Bukkit.getServicesManager().register(MetricsLite.class, this, plugin, ServicePriority.Normal);
+            Bukkit.getServicesManager().register(MetricsLite.class, this, RFChairs.getInstance(), ServicePriority.Normal);
             if (!found) {
                 // We are the first!
                 startSubmitting();
@@ -126,10 +114,7 @@ public class MetricsLite {
      * @param data The data to send.
      * @throws Exception If the request failed.
      */
-    private static void sendData(JSONObject data) throws Exception {
-        if (data == null) {
-            throw new IllegalArgumentException("Data cannot be null!");
-        }
+    private static void sendData(@NotNull JSONObject data) throws Exception {
         if (Bukkit.isPrimaryThread()) {
             throw new IllegalAccessException("This method must not be called from the main thread!");
         }
@@ -164,7 +149,8 @@ public class MetricsLite {
      * @return The gzipped String.
      * @throws IOException If the compression failed.
      */
-    private static byte[] compress(final String str) throws IOException {
+    @Contract("null -> null; !null -> !null")
+    private static byte @Nullable [] compress(final @Nullable String str) throws IOException {
         if (str == null) {
             return null;
         }
@@ -183,18 +169,13 @@ public class MetricsLite {
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                if (!plugin.isEnabled()) { // Plugin was disabled
+                if (!RFChairs.getInstance().isEnabled()) { // Plugin was disabled
                     timer.cancel();
                     return;
                 }
                 // Nevertheless we want our code to run in the Bukkit main thread, so we have to use the Bukkit scheduler
                 // Don't be afraid! The connection to the bStats server is still async, only the stats collection is sync ;)
-                Bukkit.getScheduler().runTask(plugin, new Runnable() {
-                    @Override
-                    public void run() {
-                        submitData();
-                    }
-                });
+                Bukkit.getScheduler().runTask(RFChairs.getInstance(), () -> submitData());
             }
         }, 1000 * 60 * 5, 1000 * 60 * 30);
         // Submit the data every 30 minutes, first time after 5 minutes to give other plugins enough time to start
@@ -209,11 +190,11 @@ public class MetricsLite {
      * @return The plugin specific data.
      */
     @SuppressWarnings("unchecked")
-    public JSONObject getPluginData() {
+    public @NotNull JSONObject getPluginData() {
         JSONObject data = new JSONObject();
 
-        String pluginName = plugin.getDescription().getName();
-        String pluginVersion = plugin.getDescription().getVersion();
+        String pluginName = RFChairs.getInstance().getDescription().getName();
+        String pluginVersion = RFChairs.getInstance().getDescription().getVersion();
 
         data.put("pluginName", pluginName); // Append the name of the plugin
         data.put("pluginVersion", pluginVersion); // Append the version of the plugin
@@ -229,7 +210,7 @@ public class MetricsLite {
      * @return The server specific data.
      */
     @SuppressWarnings("unchecked")
-    private JSONObject getServerData() {
+    private @NotNull JSONObject getServerData() {
         // Minecraft specific data
         int playerAmount;
         try {
@@ -297,20 +278,16 @@ public class MetricsLite {
         data.put("plugins", pluginData);
 
         // Create a new thread for the connection to the bStats server
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    // Send the data
-                    sendData(data);
-                } catch (Exception e) {
-                    // Something went wrong! :(
-                    if (logFailedRequests) {
-                        plugin.getLogger().log(Level.WARNING, "Could not submit plugin stats of " + plugin.getName(), e);
-                    }
+        new Thread(() -> {
+            try {
+                // Send the data
+                sendData(data);
+            } catch (Exception e) {
+                // Something went wrong! :(
+                if (logFailedRequests) {
+                    RFChairs.getInstance().getLogger().log(Level.WARNING, "Could not submit plugin stats of " + RFChairs.getInstance().getName(), e);
                 }
             }
         }).start();
     }
-
 }

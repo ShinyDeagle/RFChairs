@@ -1,27 +1,26 @@
 package com.rifledluffy.chairs.command.commands;
 
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.permissions.Permissible;
+import org.jetbrains.annotations.NotNull;
 
-public abstract class SubCommand {
+/**
+ * /<command> <subcommand> args[0] args[1]
+ */
+public interface SubCommand {
 
-    /*
-    /<command> <subcommand> args[0] args[1]
-     */
+    void onCommand(@NotNull CommandSender sender, @NotNull String[] args);
 
-    public SubCommand() {
-    }
+    void onPlayerCommand(@NotNull Player player, @NotNull String[] args);
 
-    public abstract void onCommand(CommandSender sender, String[] args);
+    @NotNull String name();
 
-    public abstract void onCommand(ConsoleCommandSender sender, String[] args);
+    @NotNull String info();
 
-    public abstract void onCommand(Player player, String[] args);
+    @NotNull String @NotNull [] aliases();
 
-    public abstract String name();
+    boolean needsPlayer();
 
-    public abstract String info();
-
-    public abstract String[] aliases();
+    boolean checkPermission(@NotNull Permissible permissible);
 }

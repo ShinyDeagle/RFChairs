@@ -11,29 +11,29 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 public class MessageManager implements Listener {
-
     private final RFChairs plugin = RFChairs.getPlugin(RFChairs.class);
-    private final List<UUID> tempMute = new ArrayList<UUID>();
-    public List<UUID> muted = new ArrayList<UUID>();
+    private final List<UUID> tempMute = new ArrayList<>();
+    public List<UUID> muted = new ArrayList<>();
     private ConfigManager configManager = plugin.getConfigManager();
     public FileConfiguration messages = configManager.getMessages();
     private boolean allowMessages;
     private int tempMuteDuration;
 
-    public void reload(RFChairs plugin) {
+    public void reload(@NotNull RFChairs plugin) {
         configManager = plugin.getConfigManager();
         messages = configManager.getMessages();
         allowMessages = configManager.getConfig().getBoolean("allow-custom-messages", true);
         tempMuteDuration = messages.getInt("temp-mute-duration", 0);
     }
 
-    private void tempMute(Player player) {
+    private void tempMute(@NotNull Player player) {
         int duration = tempMuteDuration;
         tempMute.add(player.getUniqueId());
         BukkitRunnable runnable = new BukkitRunnable() {
@@ -45,12 +45,12 @@ public class MessageManager implements Listener {
         runnable.runTaskLater(plugin, duration);
     }
 
-    private boolean tempMuted(Player player) {
+    private boolean tempMuted(@NotNull Player player) {
         return tempMute.contains(player.getUniqueId());
     }
 
     @EventHandler
-    public void onMessage(MessageEvent event) {
+    public void onMessage(@NotNull MessageEvent event) {
         Player player = event.getPlayer();
         if (tempMute.contains(player.getUniqueId())) event.setCancelled(true);
         if (event.isCancelled()) return;
@@ -61,7 +61,7 @@ public class MessageManager implements Listener {
         }
     }
 
-    private String processString(MessageEvent event) {
+    private String processString(@NotNull MessageEvent event) {
         MessageType type = event.getType();
         MessageConstruct construct = event.getConstruct();
         String string;
