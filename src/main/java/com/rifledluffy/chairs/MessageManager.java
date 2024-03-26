@@ -6,11 +6,11 @@ import com.rifledluffy.chairs.messages.MessageEvent;
 import com.rifledluffy.chairs.messages.MessageType;
 import com.rifledluffy.chairs.messages.Messages;
 import com.rifledluffy.chairs.utility.Util;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -36,13 +36,12 @@ public class MessageManager implements Listener {
     private void tempMute(@NotNull Player player) {
         int duration = tempMuteDuration;
         tempMute.add(player.getUniqueId());
-        BukkitRunnable runnable = new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (tempMuted(player)) tempMute.remove(player.getUniqueId());
+
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            if (tempMuted(player)) {
+                tempMute.remove(player.getUniqueId());
             }
-        };
-        runnable.runTaskLater(plugin, duration);
+        }, duration);
     }
 
     private boolean tempMuted(@NotNull Player player) {
@@ -52,12 +51,20 @@ public class MessageManager implements Listener {
     @EventHandler
     public void onMessage(@NotNull MessageEvent event) {
         Player player = event.getPlayer();
-        if (tempMute.contains(player.getUniqueId())) event.setCancelled(true);
-        if (event.isCancelled()) return;
-        if (tempMuteDuration > 0) tempMute(player);
+        if (tempMute.contains(player.getUniqueId())) {
+            event.setCancelled(true);
+        }
+        if (event.isCancelled()) {
+            return;
+        }
+        if (tempMuteDuration > 0) {
+            tempMute(player);
+        }
         if (allowMessages && !muted.contains(player.getUniqueId())) {
             String string = processString(event);
-            if (!string.isEmpty()) player.sendMessage(string);
+            if (!string.isEmpty()) {
+                player.sendMessage(string);
+            }
         }
     }
 
@@ -65,43 +72,38 @@ public class MessageManager implements Listener {
         MessageType type = event.getType();
         MessageConstruct construct = event.getConstruct();
         String string;
-
-        String stringOutput = Messages.getMessage(type);
-        if (stringOutput == null) {
-            string = Messages.getDefault(type);
-        } else {
-            string = stringOutput;
-        }
-
-        string = messages.getString(string);
+        string = messages.getString(Messages.getMessage(type));
 
         String finalString = "";
 
-        if (construct == MessageConstruct.SINGLE) finalString = Util.replaceMessage(event.getPlayer(), string);
-        else if (construct == MessageConstruct.DEFENSIVE)
+        if (construct == MessageConstruct.SINGLE) {
+            finalString = Util.replaceMessage(event.getPlayer(), string);
+        } else if (construct == MessageConstruct.DEFENSIVE) {
             finalString = Util.replaceMessage(event.getEntity(), event.getPlayer(), string);
-        else if (construct == MessageConstruct.OFFENSIVE && event.getEntity() instanceof Player)
+        } else if (construct == MessageConstruct.OFFENSIVE && event.getEntity() instanceof Player) {
             finalString = Util.replaceMessage(event.getPlayer(), (Player) event.getEntity(), string);
+        }
         return finalString;
     }
 
     void saveMuted() {
-        List<String> ids = new ArrayList<String>();
-        if (muted == null || muted.size() == 0) configManager.getData().set("Muted", new ArrayList<String>());
+        List<String> ids = new ArrayList<>();
+        if (muted == null || muted.isEmpty()) configManager.getData().set("Muted", new ArrayList<String>());
         for (UUID id : muted) ids.add(id.toString());
-        plugin.getServer().getLogger().info("[RFChairs] Saving " + ids.size() + " Players that had events muted.");
+        plugin.getServer().getLogger().info("Saving " + ids.size() + " Players that had events muted.");
         configManager.getData().set("Muted", ids);
     }
 
     void loadMuted() {
         List<String> muted = configManager.getData().getStringList("Muted");
-        if (muted == null || muted.size() == 0) return;
-        plugin.getServer().getLogger().info("[RFChairs] " + muted.size() + " Players had events muted off. Adding Them...");
+        if (muted.isEmpty()) {
+            return;
+        }
+        plugin.getServer().getLogger().info(muted.size() + " Players had events muted off. Adding Them...");
         for (String toggler : muted) {
             UUID id = UUID.fromString(toggler);
             this.muted.add(id);
         }
         configManager.getData().set("Muted", new ArrayList<String>());
     }
-
 }

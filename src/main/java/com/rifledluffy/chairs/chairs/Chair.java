@@ -7,9 +7,9 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.type.Stairs;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
-import org.bukkit.material.Stairs;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
@@ -79,8 +79,10 @@ public class Chair {
     }
 
     public @Nullable BlockFace getFacing() {
-        if (!BlockFilter.isStairsBlock(chair.getType())) return null;
-        return ((Stairs) chair.getState().getData()).getFacing();
+        if (BlockFilter.isStairsBlock(chair.getType())) {
+            return ((Stairs) chair.getState().getData()).getFacing();
+        }
+        return null;
     }
 
     /*

@@ -544,14 +544,14 @@ public class ChairManager implements Listener {
         List<String> ids = new ArrayList<>();
         if (toggled == null || toggled.isEmpty()) configManager.getData().set("Toggled", new ArrayList<String>());
         for (UUID id : toggled) ids.add(id.toString());
-        plugin.getServer().getLogger().info("[RFChairs] Saving " + ids.size() + " Players that had toggled off.");
+        plugin.getServer().getLogger().info("Saving " + ids.size() + " Players that had toggled off.");
         configManager.getData().set("Toggled", ids);
     }
 
     void loadToggled() {
         List<String> toggled = configManager.getData().getStringList("Toggled");
         if (toggled.isEmpty()) return;
-        plugin.getServer().getLogger().info("[RFChairs] " + toggled.size() + " Players had toggled off. Adding Them...");
+        plugin.getServer().getLogger().info("" + toggled.size() + " Players had toggled off. Adding Them...");
 
         toggled.stream()
                 .map(UUID::fromString)
@@ -591,7 +591,7 @@ public class ChairManager implements Listener {
         List<String> fakes = configManager.getData().getStringList("UUIDs");
         int leftoverFakes = fakes.size();
         if (leftoverFakes >= 1) {
-            plugin.getServer().getLogger().info("[RFChairs] Detected " + fakes.size() + " leftover seats! Removing...");
+            plugin.getServer().getLogger().info("Detected " + fakes.size() + " leftover seats! Removing...");
             for (String fake : fakes) {
                 UUID id = UUID.fromString(fake);
                 Entity armorStand = plugin.getServer().getEntity(id);
@@ -600,8 +600,7 @@ public class ChairManager implements Listener {
             }
             configManager.getData().set("UUIDs", new ArrayList<UUID>());
         } else {
-            plugin.getServer().getLogger().info("[RFChairs] No fake seats remaining! Proceeding");
+            plugin.getServer().getLogger().info("No fake seats remaining! Proceeding");
         }
     }
-
 }

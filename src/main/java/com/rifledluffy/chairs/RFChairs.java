@@ -9,6 +9,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
@@ -24,7 +25,7 @@ public class RFChairs extends JavaPlugin {
         return instance;
     }
 
-    private static void setInstance(RFChairs instance) {
+    private static void setInstance(@NotNull RFChairs instance) {
         RFChairs.instance = instance;
     }
 
@@ -47,7 +48,9 @@ public class RFChairs extends JavaPlugin {
             getLogger().info("Latest WorldGuard/WorldEdit features could be missing. Please Update!");
         }
 
-        if (worldGuardManager != null) worldGuardManager.register();
+        if (worldGuardManager != null) {
+            worldGuardManager.register();
+        }
     }
 
     @Override
