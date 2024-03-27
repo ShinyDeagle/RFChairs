@@ -4,7 +4,6 @@ import com.rifledluffy.chairs.RFChairs;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -73,9 +72,5 @@ public class ConfigManager {
 
     public void reloadConfig() {
         config = YamlConfiguration.loadConfiguration(configFile);
-    }
-
-    public PluginDescriptionFile getDesc() {
-        return plugin.getDescription();
     }
 }

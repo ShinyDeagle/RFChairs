@@ -229,7 +229,7 @@ public class ChairManager implements Listener {
         }
 
         if (canToss) { // todo shouldn't this check be higher up?
-            ejectPlayer(block, player, attacker);
+            tossPlayer(block, player, attacker);
         }
     }
 
@@ -389,20 +389,23 @@ public class ChairManager implements Listener {
         if (event.isCancelled()) return;
         GameMode gameMode = event.getNewGameMode();
         Chair chair = chairMap.get(event.getPlayer().getUniqueId());
-        if (gameMode == GameMode.SPECTATOR && chair != null) clearChair(chair);
+        if (gameMode == GameMode.SPECTATOR && chair != null) {
+            clearChair(chair);
+        }
     }
 
     @EventHandler
     private void onDismount(@NotNull EntityDismountEvent event) {
         if (!(event.getEntity() instanceof Player player)) return;
         Chair chair = chairMap.get(player.getUniqueId());
-        event.getDismounted();
+
         if (chair == null || event.getDismounted().getType() != EntityType.ARMOR_STAND) return;
         if (leaving.contains(player.getUniqueId())) return;
         if (orienting.contains(player.getUniqueId())) {
             orienting.remove(player.getUniqueId());
             return;
         }
+
         if (tossed.containsKey(player.getUniqueId())) {
             TargetInfo info = tossed.get(player.getUniqueId());
             Entity attacker = info.getAttacker();
@@ -410,7 +413,7 @@ public class ChairManager implements Listener {
                 attacker = info.getLivingSource();
             }
 
-            ChairTossEvent tossEvent = new ChairTossEvent(chairMap.get(player.getUniqueId()), player, attacker, info, false);
+            ChairTossEvent tossEvent = new ChairTossEvent(chair, player, attacker, info, false);
             tossEvent.callEvent();
             tossed.remove(player.getUniqueId());
             return;
@@ -451,19 +454,27 @@ public class ChairManager implements Listener {
                 info = new TargetInfo(source, attacker, event.getDamage());
             }
             tossed.put(player.getUniqueId(), info);
-            if (chair.getFakeSeat() != null) chair.getFakeSeat().removePassenger(player);
+            if (chair.getFakeSeat() != null) {
+                chair.getFakeSeat().removePassenger(player);
+            }
         }
     }
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
+    // we want to act after the event may was canceled by protection plugins
     private void onBlockBreak(@NotNull BlockBreakEvent event) {
-        if (event.isCancelled()) return;
         chairs.stream()
-                .filter(c -> c.getLocation() != null)
-                .filter(c -> Util.samePosition(event.getBlock(), c.getLocation()))
+                .filter(chair -> chair.getLocation() != null)
+                .filter(chair -> Util.samePosition(event.getBlock(), chair.getLocation()))
                 .findAny()
-                .ifPresent(c -> {
-                    if (!event.getPlayer().hasPermission("rfchairs.break")) event.setCancelled(true);
+                .ifPresent(chair -> {
+                    if (!event.getPlayer().hasPermission("rfchairs.break")) {
+                        event.setCancelled(true);
+                    } else { // eject player if block was broken. Note: the dismount event will handle the rest.
+                        if (chair.getFakeSeat() != null) {
+                            chair.getFakeSeat().removePassenger(event.getPlayer());
+                        }
+                    }
                 });
     }
 
@@ -471,8 +482,10 @@ public class ChairManager implements Listener {
     private void quit(@NotNull PlayerQuitEvent event) {
         Player player = event.getPlayer();
         Chair chair = chairMap.get(player.getUniqueId());
-        ChairLeaveEvent leaveEvent = new ChairLeaveEvent(chair, player, exitWhereFacing);
-        leaveEvent.callEvent();
+        if (chair != null) {
+            ChairLeaveEvent leaveEvent = new ChairLeaveEvent(chair, player, exitWhereFacing);
+            leaveEvent.callEvent();
+        }
     }
 
     @EventHandler
@@ -505,8 +518,10 @@ public class ChairManager implements Listener {
     private void onDeath(@NotNull PlayerDeathEvent event) {
         Player player = event.getEntity();
         Chair chair = chairMap.get(player.getUniqueId());
-        ChairLeaveEvent leaveEvent = new ChairLeaveEvent(chair, player);
-        leaveEvent.callEvent();
+        if (chair != null) {
+            ChairLeaveEvent leaveEvent = new ChairLeaveEvent(chair, player);
+            leaveEvent.callEvent();
+        }
     }
 
     /*
@@ -526,7 +541,7 @@ public class ChairManager implements Listener {
         return true;
     }
 
-    private void ejectPlayer(Block block, Player player, Entity entity) {
+    private void tossPlayer(@NotNull Block block, @NotNull Player player, @NotNull Entity entity) {
         Block exit = block;
 
         if (exitWhereFacing) {
@@ -612,7 +627,7 @@ public class ChairManager implements Listener {
         for (Chair chair : chairs) clearChair(chair);
     }
 
-    private void clearPlayer(Player player) {
+    private void clearPlayer(@NotNull Player player) {
         Chair chair = chairMap.get(player.getUniqueId());
         if (chair == null) return;
         chairMap.remove(player.getUniqueId());
