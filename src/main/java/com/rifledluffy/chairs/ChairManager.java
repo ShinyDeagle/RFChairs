@@ -338,40 +338,50 @@ public class ChairManager implements Listener {
             if (item.getType().isBlock()) return;
         }
 
-        if (!BlockFilter.isStairsBlock(block.getType())
-                && !BlockFilter.isCarpetBlock(block.getType())
-                && !BlockFilter.isSlabBlock(block.getType())) return;
-
-        if (BlockFilter.isStairsBlock(block.getType())) {
-            if (!Util.validStair(block)) return;
-            else {
-                if (checkForSigns) {
-                    if (!Util.validCouch(block)) {
-                        if (!trapSeats) return;
-                        if (!Util.throneChair(block)) {
-                            new MessageEvent(MessagePath.NOSIGNS, player).callEvent();
+        if (BlockFilter.isStairsBlock(block.getType())
+                || BlockFilter.isCarpetBlock(block.getType())
+                || BlockFilter.isSlabBlock(block.getType())) {
+            if (BlockFilter.isStairsBlock(block.getType())) {
+                if (!Util.validStair(block)) return;
+                else {
+                    if (checkForSigns) {
+                        if (!Util.validCouch(block)) {
+                            if (!trapSeats) return;
+                            if (!Util.throneChair(block)) {
+                                new MessageEvent(MessagePath.NOSIGNS, player).callEvent();
+                                return;
+                            }
+                        } else if (block.getRelative(BlockFace.UP).getType() != Material.AIR) {
                             return;
                         }
-                    } else if (block.getRelative(BlockFace.UP).getType() != Material.AIR) return;
+                    }
+                    if (trapSeats && block.getRelative(BlockFace.UP).getType() != Material.AIR) {
+                        if (!Util.throneChair(block)) return;
+                    }
                 }
-                if (trapSeats && block.getRelative(BlockFace.UP).getType() != Material.AIR) {
-                    if (!Util.throneChair(block)) return;
+            } else if (block.getRelative(BlockFace.UP).getType() != Material.AIR) return;
+
+            if (BlockFilter.isSlabBlock(block.getType())) {
+                if (!Util.validSlab(block)) {
+                    return;
                 }
             }
-        } else if (block.getRelative(BlockFace.UP).getType() != Material.AIR) return;
 
-        if (BlockFilter.isSlabBlock(block.getType())) if (!Util.validSlab(block)) return;
+            if (BlockFilter.isCarpetBlock(block.getType())) {
+                if (!Util.validCarpet(block)) {
+                    return;
+                }
+            }
 
-        if (BlockFilter.isCarpetBlock(block.getType())) if (!Util.validCarpet(block)) return;
+            if (event.getBlockFace() == BlockFace.DOWN) return;
 
-        if (event.getBlockFace() == BlockFace.DOWN) return;
+            if (!player.hasPermission("rfchairs.use")) {
+                new MessageEvent(MessagePath.SEAT_NOPERMS, player).callEvent();
+                return;
+            }
 
-        if (!player.hasPermission("rfchairs.use")) {
-            new MessageEvent(MessagePath.SEAT_NOPERMS, player).callEvent();
-            return;
+            new ChairCheckEvent(block, player).callEvent();
         }
-
-        new ChairCheckEvent(block, player).callEvent();
     }
 
     @EventHandler

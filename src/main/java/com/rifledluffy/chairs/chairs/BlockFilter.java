@@ -14,32 +14,30 @@ public class BlockFilter {
 
     public static void reload() {
         FileConfiguration config = RFChairs.getInstance().getConfig();
-        whitelist = new HashSet<>(config.getStringList("allowed-chairs"));
+        whitelist = new HashSet<>(config.getStringList("whitelisted-chairs"));
         blacklist = new HashSet<>(config.getStringList("blacklisted-chairs"));
     }
 
-    public static boolean isWhitelisted(@NotNull Material type, @NotNull String category) {
-        if (whitelist.contains("ALL_" + category)) return true;
-        return whitelist.contains(type.name());
+    public static boolean isWhitelisted(@NotNull Material type, @NotNull ChairCategory category) {
+        return whitelist.contains(category.getConfigName()) || whitelist.contains(type.name());
     }
 
-    public static boolean isBlacklisted(@NotNull Material type, @NotNull String category) {
-        if (blacklist.contains("ALL_" + category)) return true;
-        return blacklist.contains(type.name());
+    public static boolean isBlacklisted(@NotNull Material type, @NotNull ChairCategory category) {
+        return blacklist.contains(category.getConfigName()) || blacklist.contains(type.name());
     }
 
     // validate
 
     public static boolean validateCarpet(@NotNull Material type) {
-        return isWhitelisted(type, "CARPETS") && !isBlacklisted(type, "CARPET");
+        return isWhitelisted(type, ChairCategory.CARPETS) && !isBlacklisted(type, ChairCategory.CARPETS);
     }
 
     public static boolean validateSlab(@NotNull Material type) {
-        return isWhitelisted(type, "SLABS") && !isBlacklisted(type, "SLAB");
+        return isWhitelisted(type, ChairCategory.SLABS) && !isBlacklisted(type, ChairCategory.SLABS);
     }
 
     public static boolean validateStairs(@NotNull Material type) {
-        return isWhitelisted(type, "STAIRS") && !isBlacklisted(type, "STAIRS");
+        return isWhitelisted(type, ChairCategory.STAIRS) && !isBlacklisted(type, ChairCategory.STAIRS);
     }
 
     // check
@@ -54,5 +52,21 @@ public class BlockFilter {
 
     public static boolean isStairsBlock(@NotNull Material type) {
         return Tag.STAIRS.isTagged(type);
+    }
+
+    public enum ChairCategory {
+        SLABS("ALL_SLABS"),
+        STAIRS("ALL_STAIRS"),
+        CARPETS("ALL_CARPETS");
+
+        private final String configName;
+
+        ChairCategory(String configName) {
+            this.configName = configName;
+        }
+
+        public String getConfigName() {
+            return configName;
+        }
     }
 }

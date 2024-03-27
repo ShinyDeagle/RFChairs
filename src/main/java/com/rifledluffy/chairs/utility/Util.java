@@ -144,14 +144,14 @@ public class Util {
     }
 
     public static boolean throneChair(@NotNull Block block) {
-        if (!(block.getBlockData() instanceof Stairs)) {
+        if (!(block.getBlockData() instanceof Stairs stairs)) {
             return false;
         }
         if (block.getRelative(BlockFace.UP).getBlockData() instanceof TrapDoor trapDoor) {
             if (!trapDoor.isOpen()) {
                 return false;
             }
-            return trapDoor.getFacing().getOppositeFace() == ((Stairs) block.getBlockData()).getFacing();
+            return trapDoor.getFacing().getOppositeFace() == stairs.getFacing();
         }
         return false;
     }
