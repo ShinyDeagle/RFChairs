@@ -8,7 +8,7 @@ plugins {
 
 group = "com.rifledluffy.chairs"
 version = "7.0.0-SNAPSHOT"
-description = "A Greensurvivors Plugin "
+description = "Chairs but Rifle's way."
 // this is the minecraft major version. If you need a subversion like 1.20.1,
 // change it in the dependencies section as this is also used as the api version of the plugin.yml
 val mainMCVersion by extra("1.20")
@@ -46,7 +46,7 @@ tasks {
   }
 
     shadowJar {
-        // Relocates the packages of bstats so they don't conflict with other plugins
+        // Relocates the packages of bstats, so they don't conflict with other plugins
         relocate("org.bstats", "com.rifledluffy.chairs.dependencies.bstats")
   }
 
