@@ -87,7 +87,7 @@ public class RFChairs extends JavaPlugin {
         getLogger().info("Saving Configuration Files!");
         cfgManager.saveData();
 
-        Bukkit.getOnlinePlayers().forEach(p -> {
+        Bukkit.getOnlinePlayers().forEach(p -> { // todo just clearing regen from everyone is NOT right. should only clear sitting players
             PotionEffect regen = p.getPotionEffect(PotionEffectType.REGENERATION);
             if (regen == null) return;
             if (regen.getDuration() > 1000) p.removePotionEffect(PotionEffectType.REGENERATION);

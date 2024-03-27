@@ -78,11 +78,8 @@ public class CommandManager implements CommandExecutor {
                 return sc;
             }
 
-            String[] aliases;
-            int length = (aliases = sc.aliases()).length;
-
-            for (int var5 = 0; var5 < length; ++var5) {
-                String alias = aliases[var5];
+            String[] aliases = sc.aliases();
+            for (String alias : aliases) {
                 if (name.equalsIgnoreCase(alias)) {
                     return sc;
                 }

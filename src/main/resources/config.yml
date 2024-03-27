@@ -35,8 +35,6 @@
 stair-seating-position: 0.5,0.3,0.5
 slab-seating-positiong: 0.5,0.3,0.5
 carpet-seating-position: 0.5,-0.15,0.5
-disable-update-message-if-on-latest: false
-disable-update-messages: false
 exit-seat-where-facing: false
 allow-trap-door-chairs: true
 require-empty-hand: false

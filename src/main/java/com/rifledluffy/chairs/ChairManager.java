@@ -58,8 +58,8 @@ public class ChairManager implements Listener {
     private PotionEffect regenEffect = new PotionEffect(PotionEffectType.REGENERATION, 655200, config.getInt("regen-potency", 0), false, false);
     private boolean regenWhenSitting;
     //Update related
-    private boolean disableCurrentUpdate; //todo
-    private boolean disableUpdates; //todo
+    //private boolean disableCurrentUpdate; //todo
+    //private boolean disableUpdates; //todo
     //Kick them off their seat if they take damage
     private boolean canLaunch;
     //Toss them off their seat if they take damage
@@ -89,8 +89,8 @@ public class ChairManager implements Listener {
         regenEffect = new PotionEffect(PotionEffectType.REGENERATION, 655200, config.getInt("regen-potency", 0), false, false);
         regenWhenSitting = config.getBoolean("regen-when-sitting", true);
 
-        disableCurrentUpdate = config.getBoolean("disable-update-message-if-on-latest", false);
-        disableUpdates = config.getBoolean("disable-update-messages", false);
+        //disableCurrentUpdate = config.getBoolean("disable-update-message-if-on-latest", false);
+        //disableUpdates = config.getBoolean("disable-update-messages", false);
 
         faceAttacker = config.getBoolean("face-attacker-when-ejected", false);
         canToss = config.getBoolean("toss-player", false);

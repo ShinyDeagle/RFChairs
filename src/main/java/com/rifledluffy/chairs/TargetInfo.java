@@ -49,6 +49,6 @@ public class TargetInfo {
     }
 
     protected boolean livingSource() {
-        return source != null && source instanceof LivingEntity;
+        return source instanceof LivingEntity;
     }
 }
