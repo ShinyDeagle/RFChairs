@@ -4,7 +4,7 @@ import com.rifledluffy.chairs.chairs.BlockFilter;
 import com.rifledluffy.chairs.command.CommandManager;
 import com.rifledluffy.chairs.config.ConfigManager;
 import com.rifledluffy.chairs.dependencymanagers.WorldGuardManager;
-import com.rifledluffy.chairs.metrics.MetricsLite;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
@@ -54,7 +54,7 @@ public class RFChairs extends JavaPlugin {
     @Override
     public void onEnable() {
         @SuppressWarnings("unused")
-        MetricsLite metrics = new MetricsLite();
+        Metrics metrics = new Metrics(this, 2979);
 
         commandManager = new CommandManager();
         commandManager.setup();

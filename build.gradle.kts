@@ -3,6 +3,7 @@ plugins {
     //java
     id("io.papermc.paperweight.userdev") version "1.5.11"
 	id("xyz.jpenilla.run-paper") version "2.2.3" // Adds runServer and runMojangMappedServer tasks for testing
+    id("com.github.johnrengelman.shadow") version "8.1.1" // shades bstats
 }
 
 group = "com.rifledluffy.chairs"
@@ -35,12 +36,18 @@ dependencies {
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.9")
     compileOnly("org.jetbrains:annotations:24.1.0")
     implementation("com.github.ben-manes.caffeine:caffeine:3.1.8") // caches
+    implementation("org.bstats:bstats-bukkit:3.0.2")
 }
 
 tasks {
   // Configure reobfJar to run when invoking the build task
   assemble {
     dependsOn(reobfJar)
+  }
+
+    shadowJar {
+        // Relocates the packages of bstats so they don't conflict with other plugins
+        relocate("org.bstats", "com.rifledluffy.chairs.dependencies.bstats")
   }
 
   compileJava {
