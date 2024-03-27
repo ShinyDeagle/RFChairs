@@ -15,6 +15,7 @@ public class BlockFilter {
     public static void reload() {
         FileConfiguration config = RFChairs.getInstance().getConfig();
         whitelist = new HashSet<>(config.getStringList("whitelisted-chairs"));
+        whitelist.addAll(config.getStringList("allowed-chairs")); // dataFixerUpper
         blacklist = new HashSet<>(config.getStringList("blacklisted-chairs"));
     }
 
