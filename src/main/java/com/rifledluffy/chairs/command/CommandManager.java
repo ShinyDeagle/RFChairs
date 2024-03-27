@@ -22,6 +22,10 @@ public class CommandManager implements CommandExecutor {
     public CommandManager() {
     }
 
+    public static @NotNull String getMainCommand() {
+        return MAIN_COMMAND;
+    }
+
     public void setup() {
         RFChairs.getInstance().getCommand(MAIN_COMMAND).setExecutor(this);
 
@@ -90,9 +94,5 @@ public class CommandManager implements CommandExecutor {
 
     public @NotNull ArrayList<@NotNull SubCommand> getSubCommands() {
         return subCommands;
-    }
-
-    public static @NotNull String getMainCommand() {
-        return MAIN_COMMAND;
     }
 }

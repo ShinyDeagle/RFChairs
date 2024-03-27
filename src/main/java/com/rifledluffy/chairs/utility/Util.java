@@ -5,6 +5,7 @@ import com.rifledluffy.chairs.chairs.BlockFilter;
 import com.rifledluffy.chairs.chairs.Chair;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Tag;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Bisected;
@@ -45,6 +46,10 @@ public class Util {
         return BlockFilter.isStairsBlock(block.getType()) && validStair(block);
     }
 
+    private static boolean isAir(Material type) {
+        return type == Material.AIR || type == Material.CAVE_AIR || type == Material.VOID_AIR;
+    }
+
     public static boolean playerIsSeated(@NotNull UUID uuid, @NotNull Map<@NotNull UUID, @NotNull Chair> chairMap) {
         Chair chair = chairMap.get(uuid);
         return chair != null;
@@ -66,7 +71,7 @@ public class Util {
 
     private static boolean validExit(@NotNull Block block) {
         Material type = block.getType();
-        return type == Material.AIR || type.name().equals("WALL_SIGN") || type.name().endsWith("_WALL_SIGN");
+        return isAir(type) || Tag.WALL_SIGNS.isTagged(type);
     }
 
     public static boolean isLiquidOrMagma(@NotNull Block block) {
@@ -88,7 +93,7 @@ public class Util {
         BlockFace side = faces.get(0);
         BlockFace otherSide = faces.get(1);
 
-        if (block.getRelative(BlockFace.UP).getType() != Material.AIR) {
+        if (!isAir(block.getRelative(BlockFace.UP).getType())) {
             return false;
         }
 
@@ -298,11 +303,11 @@ public class Util {
     }
 
     public static boolean canFitPlayer(@NotNull Block block) {
-        return block.getType() == Material.AIR && block.getRelative(BlockFace.UP).getType() == Material.AIR;
+        return isAir(block.getType()) && isAir(block.getRelative(BlockFace.UP).getType());
     }
 
     public static boolean safePlace(@NotNull Block block) {
-        return block.getRelative(BlockFace.DOWN).getType() != Material.AIR;
+        return !isAir(block.getRelative(BlockFace.DOWN).getType());
     }
 
     public static Vector getVectorDir(@NotNull Location caster, @NotNull Location target) {

@@ -78,7 +78,7 @@ public class Chair {
         if (chair == null) {
             return null;
         } else {
-        return chair.getState();
+            return chair.getState();
         }
     }
 
@@ -86,7 +86,7 @@ public class Chair {
         if (chair == null) {
             return null;
         } else {
-        return chair.getState().getBlockData();
+            return chair.getState().getBlockData();
         }
     }
 

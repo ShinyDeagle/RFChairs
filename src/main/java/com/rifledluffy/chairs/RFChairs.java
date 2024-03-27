@@ -3,7 +3,7 @@ package com.rifledluffy.chairs;
 import com.rifledluffy.chairs.chairs.BlockFilter;
 import com.rifledluffy.chairs.command.CommandManager;
 import com.rifledluffy.chairs.config.ConfigManager;
-import com.rifledluffy.chairs.managers.WorldGuardManager;
+import com.rifledluffy.chairs.dependencymanagers.WorldGuardManager;
 import com.rifledluffy.chairs.metrics.MetricsLite;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -124,10 +124,6 @@ public class RFChairs extends JavaPlugin {
 
     public WorldGuardManager getWorldGuardManager() {
         return this.worldGuardManager;
-    }
-
-    public void log(String string) {
-        getLogger().info(string);
     }
 
     boolean hasWorldGuard() {
