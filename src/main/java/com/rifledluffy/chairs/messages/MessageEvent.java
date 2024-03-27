@@ -1,7 +1,7 @@
 package com.rifledluffy.chairs.messages;
 
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
@@ -10,51 +10,23 @@ import org.jetbrains.annotations.Nullable;
 
 public class MessageEvent extends Event implements Cancellable {
     private static final @NotNull HandlerList handlers = new HandlerList();
-    private final @NotNull MessageType type;
-    private final @NotNull MessageConstruct construct;
-    private final @NotNull Player player;
-    private final @Nullable Entity other;
+    private final @NotNull MessagePath type;
+    private @NotNull TagResolver @Nullable [] resolvers;
+    private @NotNull Audience audience;
     private boolean cancelled;
 
-    public MessageEvent(@NotNull MessageType type, @NotNull MessageConstruct construct, @NotNull Player player, @NotNull Player other) {
+    public MessageEvent(@NotNull MessagePath type, @NotNull Audience audience, @NotNull TagResolver @Nullable ... resolvers) {
         this.type = type;
-        this.construct = construct;
-        this.player = player;
-        this.other = other;
-    }
-
-    public MessageEvent(@NotNull MessageType type, @NotNull Player player, @NotNull Entity other) {
-        this.type = type;
-        this.construct = MessageConstruct.DEFENSIVE;
-        this.player = player;
-        this.other = other;
-    }
-
-    public MessageEvent(@NotNull MessageType type, @NotNull Player player) {
-        this.type = type;
-        this.construct = MessageConstruct.SINGLE;
-        this.player = player;
-        this.other = null;
+        this.audience = audience;
+        this.resolvers = resolvers;
     }
 
     static public @NotNull HandlerList getHandlerList() {
         return handlers;
     }
 
-    public @NotNull MessageType getType() {
+    public @NotNull MessagePath getType() {
         return this.type;
-    }
-
-    public @NotNull MessageConstruct getConstruct() {
-        return this.construct;
-    }
-
-    public @NotNull Player getPlayer() {
-        return this.player;
-    }
-
-    public @Nullable Entity getEntity() {
-        return this.other;
     }
 
     @Override
@@ -70,5 +42,21 @@ public class MessageEvent extends Event implements Cancellable {
     @Override
     public void setCancelled(boolean cancel) {
         this.cancelled = cancel;
+    }
+
+    public @NotNull Audience getAudience() {
+        return audience;
+    }
+
+    public void setAudience(@NotNull Audience audience) {
+        this.audience = audience;
+    }
+
+    public @NotNull TagResolver[] getResolvers() {
+        return resolvers;
+    }
+
+    public void setResolvers(@NotNull TagResolver[] replacingResolvers) {
+        this.resolvers = replacingResolvers;
     }
 }

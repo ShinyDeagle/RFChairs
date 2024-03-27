@@ -1,19 +1,22 @@
 package com.rifledluffy.chairs.command.commands;
 
+import net.kyori.adventure.text.Component;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permissible;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+
 public class InfoCommand implements SubCommand { //todo
 
     @Override
-    public void onCommand(@NotNull CommandSender sender, @NotNull String[] args) {
+    public void onCommand(@NotNull CommandSender sender, @NotNull List<@NotNull String> args) {
 
     }
 
     @Override
-    public void onPlayerCommand(@NotNull Player player, @NotNull String[] args) {
+    public void onPlayerCommand(@NotNull Player player, @NotNull List<@NotNull String> args) {
     }
 
     @Override
@@ -22,8 +25,8 @@ public class InfoCommand implements SubCommand { //todo
     }
 
     @Override
-    public @NotNull String info() {
-        return "";
+    public @NotNull Component info() {
+        return Component.empty();
     }
 
     @Override

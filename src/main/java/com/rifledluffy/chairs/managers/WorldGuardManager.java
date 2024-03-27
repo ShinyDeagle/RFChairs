@@ -14,6 +14,8 @@ import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -40,14 +42,17 @@ public class WorldGuardManager {
         }
     }
 
-    public WorldGuardPlugin getWorldGuard() {
+    public @Nullable WorldGuardPlugin getWorldGuard() { // todo cache the plugin
         Plugin plugin = this.plugin.getServer().getPluginManager().getPlugin("WorldGuard");
 
-        if (!(plugin instanceof WorldGuardPlugin)) return null;
-        return (WorldGuardPlugin) plugin;
+        if (plugin instanceof WorldGuardPlugin worldGuardPlugin) {
+            return worldGuardPlugin;
+        } else {
+            return null;
+        }
     }
 
-    public boolean validateSeating(Chair chair, Player player) {
+    public boolean validateSeating(@NotNull Chair chair, @NotNull Player player) {
         double xPos = chair.getLocation().getX();
         double yPos = chair.getLocation().getY();
         double zPos = chair.getLocation().getZ();
@@ -75,5 +80,4 @@ public class WorldGuardManager {
     public Flag<?> getFlag() {
         return flag;
     }
-
 }

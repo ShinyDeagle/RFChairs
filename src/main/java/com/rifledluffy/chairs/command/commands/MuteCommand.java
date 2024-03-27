@@ -2,7 +2,8 @@ package com.rifledluffy.chairs.command.commands;
 
 import com.rifledluffy.chairs.MessageManager;
 import com.rifledluffy.chairs.RFChairs;
-import com.rifledluffy.chairs.utility.Util;
+import com.rifledluffy.chairs.messages.MessagePath;
+import net.kyori.adventure.text.Component;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permissible;
@@ -13,23 +14,18 @@ import java.util.UUID;
 
 public class MuteCommand implements SubCommand {
 
-    public void onCommand(@NotNull CommandSender sender, @NotNull String[] args) {
+    public void onCommand(@NotNull CommandSender sender, @NotNull List<@NotNull String> args) {
     }
 
     @Override
-    public void onPlayerCommand(@NotNull Player player, @NotNull String[] args) {
+    public void onPlayerCommand(@NotNull Player player, @NotNull List<@NotNull String> args) {
         MessageManager messageManager = RFChairs.getInstance().getMessageManager();
-        List<UUID> muted = messageManager.muted;
-        String message;
+        List<UUID> muted = messageManager.getMuted();
         if (muted.contains(player.getUniqueId())) {
-            String string = messageManager.messages.getString("mute-message-enabled", "&8[&6Rifle's Chairs&8] &7Event Messaging is now &cDisabled!");
-            message = Util.replaceMessage(player, string);
-            player.sendMessage(message);
+            messageManager.sendLang(player, MessagePath.COMMAND_MUTE_ENABLED);
             muted.remove(player.getUniqueId());
         } else {
-            String string = messageManager.messages.getString("mute-message-disabled", "&8[&6Rifle's Chairs&8] &7Event Messaging is now &aEnabled!");
-            message = Util.replaceMessage(player, string);
-            player.sendMessage(message);
+            messageManager.sendLang(player, MessagePath.COMMAND_MUTE_DISABLED);
             muted.add(player.getUniqueId());
         }
     }
@@ -40,8 +36,8 @@ public class MuteCommand implements SubCommand {
     }
 
     @Override
-    public @NotNull String info() {
-        return "";
+    public @NotNull Component info() {
+        return RFChairs.getInstance().getMessageManager().getLang(MessagePath.COMMAND_MUTE_INFO);
     }
 
     @Override

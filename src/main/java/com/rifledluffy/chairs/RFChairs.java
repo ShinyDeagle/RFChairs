@@ -11,8 +11,6 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
-
 public class RFChairs extends JavaPlugin {
     private static RFChairs instance;
     private CommandManager commandManager;
@@ -21,7 +19,7 @@ public class RFChairs extends JavaPlugin {
     private MessageManager messageManager;
     private WorldGuardManager worldGuardManager;
 
-    public static RFChairs getInstance() {
+    public static @NotNull RFChairs getInstance() {
         return instance;
     }
 
@@ -72,7 +70,7 @@ public class RFChairs extends JavaPlugin {
 
         BlockFilter.reload();
         chairManager.reload(this);
-        messageManager.reload(this);
+        messageManager.reload();
         getServer().getPluginManager().registerEvents(chairManager, this);
         getServer().getPluginManager().registerEvents(messageManager, this);
 
@@ -100,11 +98,7 @@ public class RFChairs extends JavaPlugin {
 
     public void loadConfigManager() {
         cfgManager = new ConfigManager();
-        try {
-            cfgManager.setup();
-        } catch (IOException e) {
-            getInstance().getComponentLogger().info("Could not setup ConfigManager", e);
-        }
+        cfgManager.setup();
         cfgManager.reloadConfig();
     }
 

@@ -34,6 +34,7 @@ dependencies {
     paperweight.paperDevBundle("$mainMCVersion.1-R0.1-SNAPSHOT")
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.9")
     compileOnly("org.jetbrains:annotations:24.1.0")
+    implementation("com.github.ben-manes.caffeine:caffeine:3.1.8") // caches
 }
 
 tasks {

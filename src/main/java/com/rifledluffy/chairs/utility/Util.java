@@ -3,7 +3,6 @@ package com.rifledluffy.chairs.utility;
 import com.rifledluffy.chairs.RFChairs;
 import com.rifledluffy.chairs.chairs.BlockFilter;
 import com.rifledluffy.chairs.chairs.Chair;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -16,8 +15,6 @@ import org.bukkit.block.data.type.Stairs;
 import org.bukkit.block.data.type.TrapDoor;
 import org.bukkit.block.data.type.WallSign;
 import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Contract;
@@ -27,50 +24,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 public class Util {
-    public static void debug(@NotNull String message) {
-        for (Player player : RFChairs.getInstance().getServer().getOnlinePlayers()) {
-            player.sendMessage(message);
-        }
-    }
-
-    public static void debug(@NotNull Object message) {
-        debug(message.toString());
-    }
-
-    public static void debug(@NotNull List<@NotNull Object> messages) {
-        messages.forEach(Util::debug);
-    }
-
-    public static @NotNull String replaceMessage(@NotNull Player player, @NotNull String string) {
-        string = ChatColor.translateAlternateColorCodes('&', string);
-        string = string.replace("%user%", player.getDisplayName());
-        return string;
-    }
-
-    public static String replaceMessage(@NotNull Entity entity, @NotNull Player target, @NotNull String string) {
-        if (entity instanceof LivingEntity) return replaceMessage((LivingEntity) entity, target, string);
-
-        string = ChatColor.translateAlternateColorCodes('&', string);
-        string = string.replace("%user%", entity.getName());
-        string = string.replace("%seated%", target.getName());
-        return string;
-    }
-
-    public static String replaceMessage(@NotNull LivingEntity entity, @NotNull Player target, @NotNull String string) {
-        if (entity instanceof Player) return replaceMessage((Player) entity, target, string);
-
-        string = ChatColor.translateAlternateColorCodes('&', string);
-        string = string.replace("%user%", entity.getName());
-        string = string.replace("%seated%", target.getName());
-        return string;
-    }
-
-    public static String replaceMessage(@NotNull Player player, @NotNull Player target, @NotNull String string) {
-        string = ChatColor.translateAlternateColorCodes('&', string);
-        string = string.replace("%user%", player.getDisplayName());
-        string = string.replace("%seated%", target.getName());
-        return string;
-    }
 
     public static boolean validStair(@NotNull Block block) {
         if (!BlockFilter.validateStairs(block.getType())) return false;
@@ -135,42 +88,69 @@ public class Util {
         BlockFace side = faces.get(0);
         BlockFace otherSide = faces.get(1);
 
-        if (block.getRelative(BlockFace.UP).getType() != Material.AIR) return false;
+        if (block.getRelative(BlockFace.UP).getType() != Material.AIR) {
+            return false;
+        }
 
-        if (validatedChair(block.getRelative(side))) if (validSeat(block.getRelative(side), side, block)) validSides++;
-        if (validatedChair(block.getRelative(otherSide)))
-            if (validSeat(block.getRelative(otherSide), otherSide, block)) validSides++;
+        if (validatedChair(block.getRelative(side))) {
+            if (validSeat(block.getRelative(side), side, block)) {
+                validSides++;
+            }
+        }
+        if (validatedChair(block.getRelative(otherSide))) {
+            if (validSeat(block.getRelative(otherSide), otherSide, block)) {
+                validSides++;
+            }
+        }
 
-        if (!validatedChair(block.getRelative(side))) if (validSeat(block, side, block)) validSides++;
-        if (!validatedChair(block.getRelative(otherSide))) if (validSeat(block, otherSide, block)) validSides++;
+        if (!validatedChair(block.getRelative(side))) {
+            if (validSeat(block, side, block)) {
+                validSides++;
+            }
+        }
+        if (!validatedChair(block.getRelative(otherSide))) {
+            if (validSeat(block, otherSide, block)) {
+                validSides++;
+            }
+        }
         return validSides == 2;
     }
 
     public static boolean validSeat(@NotNull Block block, @NotNull BlockFace side, @NotNull Block original) {
         Stairs stair = (Stairs) block.getState().getBlockData();
         Stairs first = (Stairs) original.getState().getBlockData();
-        if (stair.getFacing() != first.getFacing()) return false;
+        if (stair.getFacing() != first.getFacing()) {
+            return false;
+        }
         if (block.getRelative(side).getBlockData() instanceof WallSign || block.getRelative(side).getBlockData() instanceof TrapDoor) {
             Directional sign = ((Directional) block.getRelative(side).getBlockData());
             return sign.getFacing() == side;
-        } else if (validatedChair(block.getRelative(side))) return validSeat(block.getRelative(side), side, original);
+        } else if (validatedChair(block.getRelative(side))) {
+            return validSeat(block.getRelative(side), side, original);
+        }
         return false;
     }
 
     public static boolean sameSeat(@NotNull Player player, @NotNull Block block, @NotNull Map<@NotNull UUID, @NotNull Chair> chairMap) {
         Chair chair = chairMap.get(player.getUniqueId());
-        if (chair == null) return false;
+        if (chair == null || chair.getLocation() == null) {
+            return false;
+        }
         return chair.getLocation().equals(block.getLocation());
     }
 
-    public static boolean samePosition(@NotNull Block block, @NotNull Block target) {
+    public static boolean samePosition(@NotNull Block block, @NotNull Location target) {
         return block.getX() == target.getX() && block.getY() == target.getY() && block.getZ() == target.getZ();
     }
 
     public static boolean throneChair(@NotNull Block block) {
-        if (!(block.getBlockData() instanceof Stairs)) return false;
+        if (!(block.getBlockData() instanceof Stairs)) {
+            return false;
+        }
         if (block.getRelative(BlockFace.UP).getBlockData() instanceof TrapDoor trapDoor) {
-            if (!trapDoor.isOpen()) return false;
+            if (!trapDoor.isOpen()) {
+                return false;
+            }
             return trapDoor.getFacing().getOppositeFace() == ((Stairs) block.getBlockData()).getFacing();
         }
         return false;
@@ -178,42 +158,56 @@ public class Util {
 
     public static boolean blockIsChair(@NotNull Block block, @NotNull List<@Nullable Chair> chairs) {
         for (Chair chair : chairs) {
-            if (chair == null || chair.getLocation() == null) continue;
-            if (samePosition(block, chair.getBlock())) return true;
+            if (chair == null || chair.getLocation() == null) {
+                continue;
+            }
+            if (samePosition(block, chair.getLocation())) {
+                return true;
+            }
         }
         return false;
     }
 
     public static @Nullable Chair getChairFromBlock(@NotNull Block block, @NotNull List<@Nullable Chair> chairs) {
         for (Chair chair : chairs) {
-            if (chair == null || chair.getLocation() == null) continue;
-            if (samePosition(chair.getBlock(), block)) return chair;
+            if (chair == null || chair.getLocation() == null) {
+                continue;
+            }
+            if (samePosition(block, chair.getLocation())) {
+                return chair;
+            }
         }
         return null;
     }
 
     @Contract("null -> null; !null -> !null")
     public static @Nullable ArmorStand generateFakeSeat(@Nullable Chair chair) {
-        if (chair == null) return null;
+        if (chair == null) {
+            return null;
+        }
         Vector seatingPosition = new Vector(0.5, 0.3D, 0.5);
         Location seat = chair.getLocation();
         BlockFace facing = null;
-        if (BlockFilter.isStairsBlock(chair.getBlock().getType()))
+        if (BlockFilter.isStairsBlock(chair.getBlock().getType())) {
             facing = ((Stairs) chair.getBlock().getState().getBlockData()).getFacing();
+        }
         Location playerLoc = chair.getPlayer().getEyeLocation();
         playerLoc.setPitch(0);
         Vector vector;
-        if (facing != null) vector = getVectorFromFace(chair.getBlock(), facing.getOppositeFace());
-        else vector = getVectorFromNearBlock(chair.getBlock(), playerLoc.getBlock());
+        if (facing != null) {
+            vector = getVectorFromFace(chair.getBlock(), facing.getOppositeFace());
+        } else {
+            vector = getVectorFromNearBlock(chair.getBlock(), playerLoc.getBlock());
+        }
 
         if (BlockFilter.isStairsBlock(chair.getBlock().getType())) {
-            seatingPosition = RFChairs.getInstance().getChairManager().stairSeatingPosition;
+            seatingPosition = RFChairs.getInstance().getChairManager().getStairSeatingPosition();
         }
         if (BlockFilter.isCarpetBlock(chair.getBlock().getType())) {
-            seatingPosition = RFChairs.getInstance().getChairManager().carpetSeatingPosition;
+            seatingPosition = RFChairs.getInstance().getChairManager().getCarpetSeatingPosition();
         }
         if (BlockFilter.isSlabBlock(chair.getBlock().getType())) {
-            seatingPosition = RFChairs.getInstance().getChairManager().slabSeatingPosition;
+            seatingPosition = RFChairs.getInstance().getChairManager().getSlabSeatingPosition();
         }
 
         //Thank you VicenteRD and carlpoole!
@@ -231,20 +225,22 @@ public class Util {
 
     @Contract("null, _ -> null; !null, _ -> !null")
     public static @Nullable ArmorStand generateFakeSeatDir(@Nullable Chair chair, @NotNull Vector dir) {
-        if (chair == null) return null;
+        if (chair == null) {
+            return null;
+        }
         Vector seatingPosition = new Vector(0.5, 0.3D, 0.5);
         Location seat = chair.getLocation();
         Location playerLoc = chair.getPlayer().getEyeLocation();
         playerLoc.setPitch(0);
 
         if (BlockFilter.isStairsBlock(chair.getBlock().getType())) {
-            seatingPosition = RFChairs.getInstance().getChairManager().stairSeatingPosition;
+            seatingPosition = RFChairs.getInstance().getChairManager().getStairSeatingPosition();
         }
         if (BlockFilter.isCarpetBlock(chair.getBlock().getType())) {
-            seatingPosition = RFChairs.getInstance().getChairManager().carpetSeatingPosition;
+            seatingPosition = RFChairs.getInstance().getChairManager().getCarpetSeatingPosition();
         }
         if (BlockFilter.isSlabBlock(chair.getBlock().getType())) {
-            seatingPosition = RFChairs.getInstance().getChairManager().slabSeatingPosition;
+            seatingPosition = RFChairs.getInstance().getChairManager().getSlabSeatingPosition();
         }
 
         //Thank you VicenteRD and carlpoole!
@@ -262,7 +258,9 @@ public class Util {
 
     public static float getAbsoluteAngle(@NotNull Location loc) {
         float y = loc.getYaw();
-        if (y < 0) y += 360;
+        if (y < 0) {
+            y += 360;
+        }
         y %= 360;
         if (y <= 45 || y >= 315) return 0;
         if (y >= 45 && y <= 135) return 90;
@@ -272,7 +270,9 @@ public class Util {
 
     public static @NotNull String getCardinalDirection(@NotNull Location loc) {
         float y = loc.getYaw();
-        if (y < 0) y += 360;
+        if (y < 0) {
+            y += 360;
+        }
         y %= 360;
         if (y <= 45 || y >= 315) return "south";
         if (y >= 45 && y <= 135) return "west";

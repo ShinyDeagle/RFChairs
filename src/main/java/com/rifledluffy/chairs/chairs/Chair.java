@@ -67,20 +67,32 @@ public class Chair {
     }
 
     public @Nullable Block getBlock() {
-        return location.getBlock();
+        if (location == null) {
+            return null;
+        } else {
+            return location.getBlock();
+        }
     }
 
     public @Nullable BlockState getBlockState() {
+        if (chair == null) {
+            return null;
+        } else {
         return chair.getState();
+        }
     }
 
     public @Nullable BlockData getBlockData() {
+        if (chair == null) {
+            return null;
+        } else {
         return chair.getState().getBlockData();
+        }
     }
 
     public @Nullable BlockFace getFacing() {
-        if (BlockFilter.isStairsBlock(chair.getType())) {
-            return ((Stairs) chair.getState().getData()).getFacing();
+        if (chair != null && BlockFilter.isStairsBlock(chair.getType())) {
+            return ((Stairs) chair.getState().getBlockData()).getFacing();
         }
         return null;
     }
@@ -102,8 +114,12 @@ public class Chair {
     }
 
     public void clear() {
-        if (fakeSeat != null) fakeSeat.remove();
-        player.removePotionEffect(PotionEffectType.REGENERATION);
+        if (fakeSeat != null) {
+            fakeSeat.remove();
+        }
+        if (player != null) {
+            player.removePotionEffect(PotionEffectType.REGENERATION);
+        }
         chair = null;
         location = null;
         fakeSeat = null;

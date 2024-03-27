@@ -60,3 +60,5 @@ allowed-chairs:
   - CARPET*
 blacklisted-chairs: [ ]
 disabled-worlds: [ ]
+temp-mute-duration: 60
+language: 'en'

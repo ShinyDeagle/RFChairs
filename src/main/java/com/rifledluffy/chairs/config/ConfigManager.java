@@ -19,10 +19,8 @@ public class ConfigManager {
     private File configFile;
     private FileConfiguration fake;
     private File fakeFile;
-    private FileConfiguration message;
-    private File messageFile;
 
-    public void setup() throws IOException {
+    public void setup() {
         configFile = new File(plugin.getDataFolder(), "config.yml");
         config = plugin.getConfig();
         config.options().copyDefaults(true);
@@ -42,15 +40,7 @@ public class ConfigManager {
             }
         }
 
-        messageFile = new File(plugin.getDataFolder(), "messages.yml");
-
-        if (!messageFile.exists()) {
-            messageFile.getParentFile().mkdirs();
-            plugin.saveResource("messages.yml", false);
-        }
-
         fake = YamlConfiguration.loadConfiguration(fakeFile);
-        message = YamlConfiguration.loadConfiguration(messageFile);
     }
 
     public FileConfiguration getData() {
@@ -67,22 +57,6 @@ public class ConfigManager {
 
     public void reloadData() {
         fake = YamlConfiguration.loadConfiguration(fakeFile);
-    }
-
-    public FileConfiguration getMessages() {
-        return message;
-    }
-
-    public void saveMessages() {
-        try {
-            message.save(messageFile);
-        } catch (IOException e) {
-            plugin.getLogger().info("[Rifle's Chairs] Could not save messages.yml!");
-        }
-    }
-
-    public void reloadMessages() {
-        message = YamlConfiguration.loadConfiguration(messageFile);
     }
 
     public FileConfiguration getConfig() {

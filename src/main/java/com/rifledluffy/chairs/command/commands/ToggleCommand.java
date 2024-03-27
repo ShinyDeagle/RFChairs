@@ -2,7 +2,10 @@ package com.rifledluffy.chairs.command.commands;
 
 import com.rifledluffy.chairs.MessageManager;
 import com.rifledluffy.chairs.RFChairs;
-import com.rifledluffy.chairs.utility.Util;
+import com.rifledluffy.chairs.messages.MessagePath;
+import com.rifledluffy.chairs.messages.PlaceHolder;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permissible;
@@ -13,23 +16,21 @@ import java.util.UUID;
 
 public class ToggleCommand implements SubCommand {
 
-    public void onCommand(@NotNull CommandSender sender, @NotNull String[] args) {
+    public void onCommand(@NotNull CommandSender sender, @NotNull List<@NotNull String> args) {
     }
 
     @Override
-    public void onPlayerCommand(@NotNull Player player, @NotNull String[] args) {
+    public void onPlayerCommand(@NotNull Player player, @NotNull List<@NotNull String> args) {
         MessageManager messageManager = RFChairs.getInstance().getMessageManager();
-        List<UUID> toggled = RFChairs.getInstance().getChairManager().toggled;
-        String message;
+        List<UUID> toggled = RFChairs.getInstance().getChairManager().getToggled();
+
         if (toggled.contains(player.getUniqueId())) {
-            String string = messageManager.messages.getString("toggle-message-enabled", "&8[&6Rifle's Chairs&8] &7Seating is now &aEnabled!");
-            message = Util.replaceMessage(player, string);
-            player.sendMessage(message);
+            messageManager.sendLang(player, MessagePath.COMMAND_TOGGLE_ENABLED,
+                    Placeholder.component(PlaceHolder.PLAYER.getPlaceholder(), player.displayName()));
             toggled.remove(player.getUniqueId());
         } else {
-            String string = messageManager.messages.getString("toggle-message-disabled", "&8[&6Rifle's Chairs&8] &7Seating is now &cDisabled!");
-            message = Util.replaceMessage(player, string);
-            player.sendMessage(message);
+            messageManager.sendLang(player, MessagePath.COMMAND_TOGGLE_DISABLED,
+                    Placeholder.component(PlaceHolder.PLAYER.getPlaceholder(), player.displayName()));
             toggled.add(player.getUniqueId());
         }
     }
@@ -40,8 +41,8 @@ public class ToggleCommand implements SubCommand {
     }
 
     @Override
-    public @NotNull String info() {
-        return "";
+    public @NotNull Component info() {
+        return RFChairs.getInstance().getMessageManager().getLang(MessagePath.COMMAND_TOGGLE_INFO);
     }
 
     @Override

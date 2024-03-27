@@ -1,24 +1,28 @@
 package com.rifledluffy.chairs.command.commands;
 
 import com.rifledluffy.chairs.RFChairs;
-import net.md_5.bungee.api.ChatColor;
+import com.rifledluffy.chairs.messages.MessagePath;
+import net.kyori.adventure.text.Component;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permissible;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+
 public class ResetCommand implements SubCommand {
     private final RFChairs plugin = RFChairs.getInstance();
 
-    public void onCommand(@NotNull CommandSender sender, @NotNull String[] args) {
+    public void onCommand(@NotNull CommandSender sender, @NotNull List<@NotNull String> args) {
         plugin.getChairManager().clearFakeSeats();
         plugin.getChairManager().clearFakeSeatsFromFile(plugin);
         plugin.getLogger().info("Chairs Reset!");
-        sender.sendMessage(ChatColor.DARK_GRAY + "[" + ChatColor.GOLD + "Rifle's Chairs" + ChatColor.DARK_GRAY + "] " + ChatColor.GREEN + "Chairs Reset");
+
+        plugin.getMessageManager().sendLang(sender, MessagePath.COMMAND_RESET_SUCCESS);
     }
 
     @Override
-    public void onPlayerCommand(@NotNull Player player, @NotNull String[] args) {
+    public void onPlayerCommand(@NotNull Player player, @NotNull List<@NotNull String> args) {
         onCommand(player, args);
     }
 
@@ -28,8 +32,8 @@ public class ResetCommand implements SubCommand {
     }
 
     @Override
-    public @NotNull String info() {
-        return "Resets all chairs";
+    public @NotNull Component info() {
+        return plugin.getMessageManager().getLang(MessagePath.COMMAND_RESET_INFO);
     }
 
     @Override

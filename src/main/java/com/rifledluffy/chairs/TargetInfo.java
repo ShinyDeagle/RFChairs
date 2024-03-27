@@ -1,60 +1,54 @@
 package com.rifledluffy.chairs;
 
-import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.projectiles.BlockProjectileSource;
 import org.bukkit.projectiles.ProjectileSource;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class TargetInfo {
-    Player player;
-    Entity attacker;
-    ProjectileSource source;
-    Double damage;
-    boolean sprinting = false;
+    private final @NotNull Entity attacker;
+    private final @Nullable ProjectileSource source;
+    private final double damage;
+    private boolean sprinting = false;
 
-    TargetInfo(ProjectileSource source, Entity attacker, Double damage) {
+    protected TargetInfo(@NotNull ProjectileSource source, @NotNull Entity attacker, double damage) {
         this.source = source;
         this.attacker = attacker;
         this.damage = damage;
     }
 
-    TargetInfo(Entity attacker, Double damage) {
+    protected TargetInfo(@NotNull Entity attacker, double damage) {
         this.source = null;
-        if (attacker instanceof Player) {
-            player = (Player) attacker;
+        if (attacker instanceof Player player) {
             sprinting = player.isSprinting();
         }
         this.attacker = attacker;
         this.damage = damage;
     }
 
-    Entity getEntity() {
+    protected @NotNull Entity getAttacker() {
         return attacker;
     }
 
-    LivingEntity getLivingSource() {
+    protected LivingEntity getLivingSource() {
         return (LivingEntity) source;
     }
 
-    Block getBlockSource() {
-        return ((BlockProjectileSource) source).getBlock();
-    }
-
-    Double getDamage() {
+    protected double getDamage() {
         return damage;
     }
 
-    boolean isSprinting() {
+    protected boolean isSprinting() {
         return this.sprinting;
     }
 
-    boolean hasSource() {
+    protected boolean hasSource() {
         return source != null;
     }
 
-    boolean livingSource() {
+    protected boolean livingSource() {
         return source != null && source instanceof LivingEntity;
     }
 }
