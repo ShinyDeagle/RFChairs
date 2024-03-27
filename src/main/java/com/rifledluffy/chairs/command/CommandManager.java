@@ -5,17 +5,16 @@ import com.rifledluffy.chairs.command.commands.*;
 import com.rifledluffy.chairs.messages.MessagePath;
 import com.rifledluffy.chairs.messages.PlaceHolder;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
+import org.bukkit.command.*;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
-public class CommandManager implements CommandExecutor {
+public class CommandManager implements CommandExecutor, TabCompleter {
     private static final String MAIN_COMMAND = "rfchairs";
     private final @NotNull ArrayList<@NotNull SubCommand> subCommands = new ArrayList<>();
 
@@ -27,7 +26,13 @@ public class CommandManager implements CommandExecutor {
     }
 
     public void setup() {
-        RFChairs.getInstance().getCommand(MAIN_COMMAND).setExecutor(this);
+        PluginCommand mainCmd = RFChairs.getInstance().getCommand(MAIN_COMMAND);
+        if (mainCmd != null) {
+            mainCmd.setExecutor(this);
+            mainCmd.setTabCompleter(this);
+        } else {
+            RFChairs.getInstance().getComponentLogger().error("Could not get main command! Commands WILL be broken!");
+        }
 
         this.subCommands.add(new HelpCommand());
         //this.commands.add(new InfoCommand());
@@ -37,7 +42,7 @@ public class CommandManager implements CommandExecutor {
         this.subCommands.add(new MuteCommand());
     }
 
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String s, @NotNull String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (args.length == 0) {
             RFChairs.getInstance().getMessageManager().sendLang(sender, MessagePath.COMMAND_NOT_ENOUGH_ARGS);
             return true;
@@ -91,5 +96,32 @@ public class CommandManager implements CommandExecutor {
 
     public @NotNull ArrayList<@NotNull SubCommand> getSubCommands() {
         return subCommands;
+    }
+
+    @Override
+    public @Nullable List<@NotNull String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+        if (args.length == 1) {
+            List<String> result = new ArrayList<>();
+
+            for (SubCommand subCommand : subCommands) {
+                if (subCommand.checkPermission(sender)) {
+                    result.add(subCommand.name());
+                }
+            }
+
+            return result;
+        } else if (args.length > 1) {
+            SubCommand subCommand = this.getSubcommand(args[0]);
+
+            if (subCommand != null && subCommand.checkPermission(sender)) {
+                // clear args from subcommand
+                ArrayList<String> subcommandArgList = new ArrayList<>(Arrays.asList(args));
+                subcommandArgList.remove(0);
+
+                return subCommand.onTabComplete(sender, subcommandArgList);
+            }
+        }
+
+        return null;
     }
 }

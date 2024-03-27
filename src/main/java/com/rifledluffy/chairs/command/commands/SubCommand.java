@@ -5,6 +5,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permissible;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -26,4 +27,6 @@ public interface SubCommand {
     boolean needsPlayer();
 
     boolean checkPermission(@NotNull Permissible permissible);
+
+    @Nullable List<@NotNull String> onTabComplete(@NotNull CommandSender sender, @NotNull List<@NotNull String> args);
 }

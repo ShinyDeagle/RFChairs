@@ -8,6 +8,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permissible;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.UUID;
@@ -53,5 +54,10 @@ public class MuteCommand implements SubCommand {
     @Override
     public boolean checkPermission(@NotNull Permissible permissible) {
         return permissible.hasPermission("rfchairs.mute");
+    }
+
+    @Override
+    public @Nullable List<@NotNull String> onTabComplete(@NotNull CommandSender sender, @NotNull List<@NotNull String> args) {
+        return null;
     }
 }
